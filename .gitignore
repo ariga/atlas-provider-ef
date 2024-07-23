@@ -1,2 +1,6 @@
 **/bin
 **/obj
+**/nupkg
+artifacts/
+.vscode
+.DS_Store

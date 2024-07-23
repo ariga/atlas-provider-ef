@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{C41D6C7A-456B-4A0B-ACE1-9931DA092288}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Atlas.Provider.Loader", "src\Atlas.Provider.Loader\Atlas.Provider.Loader.csproj", "{003BD0CC-7AF6-408C-A40D-3FE8F6C73537}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Atlas.Provider.Core", "src\Atlas.Provider.Core\Atlas.Provider.Core.csproj", "{FAEB024F-B0AA-4B7C-A820-68E497657D0D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{003BD0CC-7AF6-408C-A40D-3FE8F6C73537}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{003BD0CC-7AF6-408C-A40D-3FE8F6C73537}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{003BD0CC-7AF6-408C-A40D-3FE8F6C73537}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{003BD0CC-7AF6-408C-A40D-3FE8F6C73537}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FAEB024F-B0AA-4B7C-A820-68E497657D0D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FAEB024F-B0AA-4B7C-A820-68E497657D0D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FAEB024F-B0AA-4B7C-A820-68E497657D0D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FAEB024F-B0AA-4B7C-A820-68E497657D0D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{003BD0CC-7AF6-408C-A40D-3FE8F6C73537} = {C41D6C7A-456B-4A0B-ACE1-9931DA092288}
+		{FAEB024F-B0AA-4B7C-A820-68E497657D0D} = {C41D6C7A-456B-4A0B-ACE1-9931DA092288}
+	EndGlobalSection
+EndGlobal

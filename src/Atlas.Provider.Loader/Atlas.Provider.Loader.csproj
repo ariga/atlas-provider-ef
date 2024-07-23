@@ -1,0 +1,63 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <OutputPath>..\..\artifacts\bin\$(MSBuildProjectName)\$(Configuration)\</OutputPath>
+    <TargetFramework>net6.0</TargetFramework>
+    <Configuration>$(Configuration)</Configuration>
+
+    <RootNamespace>Atlas.Provider.Loader</RootNamespace>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IncludeSource>false</IncludeSource>
+    <LangVersion>latest</LangVersion>
+    <RollForward>Major</RollForward>
+
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>atlas-ef</ToolCommandName>
+    <PackageOutputPath>..\..\artifacts\nupkg</PackageOutputPath>
+    <NuspecFile>$(MSBuildProjectName).nuspec</NuspecFile>
+    <!-- Because this project uses a custom nuspec, this is necessary to ensure the generated shims are in the publish directory. -->
+    <PackagedShimOutputRootDirectory>$(OutDir)</PackagedShimOutputRootDirectory>
+  </PropertyGroup>
+  <Target Name="SetPackageProperties" BeforeTargets="InitializeStandardNuspecProperties" DependsOnTargets="BuiltProjectOutputGroup;DebugSymbolsProjectOutputGroup">
+    <PropertyGroup>
+      <!-- Make sure we create a symbols.nupkg. -->
+      <IncludeSymbols>true</IncludeSymbols>
+      <!-- Ensure PublishDir is set -->
+      <PublishDir>$(OutputPath)</PublishDir>
+    </PropertyGroup>
+    <ItemGroup>
+      <NuspecProperty Include="packageType=$(PackageType)" />
+      <NuspecProperty Include="targetFramework=$(TargetFramework)" />
+      <NuspecProperty Include="SettingsFile=DotnetToolSettings.xml" />
+      <NuspecProperty Include="Output=artifacts/bin/Atlas.Provider.Loader/Release/net6.0/**/*" />
+      <NuspecProperty Include="OutputBinary=artifacts/bin/Atlas.Provider.Core/Release/net6.0/Atlas.Provider.Core.dll" />
+      <NuspecProperty Include="OutputRuntimeConfig=artifacts/bin/Atlas.Provider.Core/Release/net6.0/Atlas.Provider.Core.runtimeconfig.json" />
+      <NuspecProperty Include="OutputSymbol=artifacts/bin/Atlas.Provider.Core/Release/net6.0/Atlas.Provider.Core.pdb" />
+    </ItemGroup>
+  </Target>
+  <ItemGroup>
+    <None Include="DotnetToolSettings.xml" Pack="true" PackagePath="tools\netcoreapp2.1\any" />
+    <ProjectReference Include="../Atlas.Provider.Core/Atlas.Provider.Core.csproj" ReferenceOutputAssembly="false" />
+    <EmbeddedResource Include="Resources\EntityFrameworkCore.targets" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.0">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="6.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.0">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
+    <PackageReference Include="Nullable" Version="1.3.1">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="2.1.8" />
+    <PackageReference Include="System.CodeDom" Version="8.0.0" />
+    <PackageReference Include="System.CommandLine.DragonFruit" Version="0.4.0-alpha.22272.1" />
+  </ItemGroup>
+</Project>
