@@ -3,7 +3,7 @@
 
 using System;
 
-namespace Atlas.Provider.Core;
+namespace Atlas.Provider.Core.Executor;
 
 internal class WrappedException : Exception
 {
