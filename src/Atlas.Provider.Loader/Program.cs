@@ -1,10 +1,11 @@
 ﻿using System.Text.Json;
-using Atlas.Provider.Tools;
 
 namespace Atlas.Provider.Loader
 {
     static class Program
     {
+        private const string AssemblyName = "Atlas.Provider.Core";
+
         /// <summary>
         /// This class used to load the current context into Core Commands
         /// </summary>
@@ -24,177 +25,77 @@ namespace Atlas.Provider.Loader
           string[]? args = null
         )
         {
-            if (string.IsNullOrEmpty(startupProject))
-            {
-                startupProject = project;
-            }
-
-            var (projectFile, startupProjectFile) = ResolveProjects(project, startupProject);
-
-            var _project = Project.FromFile(projectFile);
-            var _startupProject = Project.FromFile(startupProjectFile);
-
+            var (projectFile, startupProjectFile) = Project.ResolveProjects(project, startupProject);
+            var _project = Project.FromFile(projectFile, null, framework);
+            var _startupProject = Project.FromFile(startupProjectFile, null, framework);
             if (!noBuild)
             {
                 _startupProject.Build();
             }
-
             var targetDir = Path.GetFullPath(Path.Combine(_startupProject.ProjectDir!, _startupProject.OutputPath!));
-            var targetPath = Path.Combine(targetDir, _project.TargetFileName!);
-            var startupTargetPath = Path.Combine(targetDir, _startupProject.TargetFileName!);
-            var depsFile = Path.Combine(
-                targetDir,
-                _startupProject.AssemblyName + ".deps.json");
-            var runtimeConfig = Path.Combine(
-                targetDir,
-                _startupProject.AssemblyName + ".runtimeconfig.json");
-            var projectAssetsFile = _startupProject.ProjectAssetsFile;
-            var libDepsFile = Path.Combine(
-               Path.GetDirectoryName(typeof(Program).Assembly.Location)!,
-                "Atlas.Provider.Core.deps.json");
-
-            string executable = "dotnet";
-            var opts = new List<string>
+            var loaderDirPath = Path.GetDirectoryName(typeof(Program).Assembly.Location);
+            var runtimeOpts = new List<string>
             {
-                "exec",
-                "--depsfile",
-                depsFile,
-                "--additional-deps",
-                libDepsFile
+                "--depsfile", Path.Combine(targetDir, _startupProject.AssemblyName + ".deps.json"),
+                // Load the deps for the atlas provider core
+                "--additional-deps", Path.Combine(loaderDirPath!, AssemblyName + ".deps.json"),
             };
-
+            var projectAssetsFile = _startupProject.ProjectAssetsFile;
             if (!string.IsNullOrEmpty(projectAssetsFile))
             {
                 using var file = File.OpenRead(projectAssetsFile);
                 using var reader = JsonDocument.Parse(file);
-                var projectAssets = reader.RootElement;
-                var packageFolders = projectAssets.GetProperty("packageFolders").EnumerateObject().Select(p => p.Name);
-
-                foreach (var packageFolder in packageFolders)
+                var folders = reader.RootElement
+                    .GetProperty("packageFolders")
+                    .EnumerateObject()
+                    .Select(p => p.Name);
+                foreach (var folder in folders)
                 {
-                    opts.Add("--additionalprobingpath");
-                    opts.Add(packageFolder.TrimEnd(Path.DirectorySeparatorChar));
+                    runtimeOpts.Add("--additionalprobingpath");
+                    runtimeOpts.Add(folder.TrimEnd(Path.DirectorySeparatorChar));
                 }
             }
 
+            var runtimeConfig = Path.Combine(targetDir, _startupProject.AssemblyName + ".runtimeconfig.json");
             if (File.Exists(runtimeConfig))
             {
-                opts.Add("--runtimeconfig");
-                opts.Add(runtimeConfig);
+                runtimeOpts.Add("--runtimeconfig");
+                runtimeOpts.Add(runtimeConfig);
             }
             else if (_startupProject.RuntimeFrameworkVersion!.Length != 0)
             {
-                opts.Add("--fx-version");
-                opts.Add(_startupProject.RuntimeFrameworkVersion);
+                runtimeOpts.Add("--fx-version");
+                runtimeOpts.Add(_startupProject.RuntimeFrameworkVersion);
             }
 
-            opts.Add(Path.GetDirectoryName(typeof(Program).Assembly.Location) + "/Atlas.Provider.Core.dll");
-
+            var arguments = new List<string>();
             if (args != null)
             {
-                opts.AddRange(args);
+                arguments.AddRange(args);
             }
-            
-            opts.Add("--assembly");
-            opts.Add(targetPath);
-            opts.Add("--project");
-            opts.Add(projectFile);
-            opts.Add("--startup-assembly");
-            opts.Add(startupTargetPath);
-            opts.Add("--startup-project");
-            opts.Add(startupProjectFile);
-            opts.Add("--project-dir");
-            opts.Add(_project.ProjectDir!);
-            opts.Add("--root-namespace");
-            opts.Add(_project.RootNamespace!);
-            opts.Add("--language");
-            opts.Add(_project.Language!);
-            opts.Add("--framework");
-            opts.Add(_startupProject.TargetFramework!);
-
+            arguments.AddRange([
+                "--root-namespace", _project.RootNamespace!,
+                "--language", _project.Language!,
+                "--project-dir", _project.ProjectDir!,
+                "--working-dir", Directory.GetCurrentDirectory(),
+                "--assembly", Path.Combine(targetDir, _project.TargetFileName!),
+                "--project", projectFile,
+                "--framework", _startupProject.TargetFramework!,
+                "--startup-assembly", Path.Combine(targetDir, _startupProject.TargetFileName!),
+                "--startup-project", startupProjectFile,
+            ]);
             if (string.Equals(_project.Nullable, "enable", StringComparison.OrdinalIgnoreCase)
                 || string.Equals(_project.Nullable, "annotations", StringComparison.OrdinalIgnoreCase))
             {
-                opts.Add("--nullable");
+                arguments.Add("--nullable");
             }
-
-            opts.Add("--working-dir");
-            opts.Add(Directory.GetCurrentDirectory());
-
-            Exe.Run(executable, opts, _startupProject.ProjectDir);
-        }
-
-        private static List<string> ResolveProjects(string? path)
-        {
-            if (path == null)
-            {
-                path = Directory.GetCurrentDirectory();
-            }
-            else
-            {
-                path = Path.GetFullPath(path);
-
-                if (!Directory.Exists(path)) // It's not a directory
-                {
-                    return new List<string> { path };
-                }
-            }
-
-            var projectFiles = Directory.EnumerateFiles(path, "*.*proj", SearchOption.TopDirectoryOnly)
-                .Where(f => !string.Equals(Path.GetExtension(f), ".xproj", StringComparison.OrdinalIgnoreCase))
-                .Take(2).ToList();
-
-            return projectFiles;
-        }
-
-        private static (string, string) ResolveProjects(
-            string? projectPath,
-            string? startupProjectPath)
-        {
-            var projects = ResolveProjects(projectPath);
-            var startupProjects = ResolveProjects(startupProjectPath);
-
-            if (projects.Count > 1)
-            {
-                throw new InvalidOperationException("Multiple projects in directory");
-            }
-
-            if (startupProjects.Count > 1)
-            {
-                throw new InvalidOperationException("Multiple projects in directory");
-            }
-
-            if (projectPath != null
-                && projects.Count == 0)
-            {
-                throw new InvalidOperationException("No project in directory");
-            }
-
-            if (startupProjectPath != null
-                && startupProjects.Count == 0)
-            {
-                throw new InvalidOperationException("No project in directory");
-            }
-
-            if (projectPath == null
-                && startupProjectPath == null)
-            {
-                return projects.Count == 0
-                    ? throw new InvalidOperationException("No project")
-                    : (projects[0], startupProjects[0]);
-            }
-
-            if (projects.Count == 0)
-            {
-                return (startupProjects[0], startupProjects[0]);
-            }
-
-            if (startupProjects.Count == 0)
-            {
-                return (projects[0], projects[0]);
-            }
-
-            return (projects[0], startupProjects[0]);
+            // dotnet exec [runtime-options] [path-to-application] [arguments]
+            Executor.Exe.Run("dotnet", [
+                "exec",
+                .. runtimeOpts,
+                Path.Combine(loaderDirPath!, AssemblyName + ".dll"),
+                .. arguments,
+            ], _startupProject.ProjectDir);
         }
     }
 }

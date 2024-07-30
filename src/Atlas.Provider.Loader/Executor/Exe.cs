@@ -10,7 +10,7 @@ Availability: https://github.com/dotnet/efcore/blob/9262a34db65ce52085ded548fc48
 using System.Diagnostics;
 using System.Text;
 
-namespace Atlas.Provider.Tools;
+namespace Atlas.Provider.Loader.Executor;
 
 internal static class Exe
 {

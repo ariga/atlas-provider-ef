@@ -18,7 +18,7 @@ namespace DemoNamespace
 
         protected override void OnConfiguring(DbContextOptionsBuilder options)
         {
-            options.UseSqlite("");
+            options.UseSqlServer("foo");
         }
     }
 

@@ -49,7 +49,7 @@ internal class ReflectionOperationExecutor : OperationExecutorBase
 
         AppDomain.CurrentDomain.AssemblyResolve += ResolveAssembly;
 
-        _commandsAssembly = System.Reflection.Assembly.Load(new System.Reflection.AssemblyName { Name = DesignAssemblyName });
+        _commandsAssembly = Assembly.Load(new AssemblyName { Name = DesignAssemblyName });
         var reportHandlerType = _commandsAssembly.GetType(ReportHandlerTypeName, throwOnError: true, ignoreCase: false)!;
 
         var reportHandler = Activator.CreateInstance(
