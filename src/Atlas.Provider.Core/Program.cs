@@ -52,7 +52,7 @@ namespace Atlas.Provider.Core
         }
         if (!string.IsNullOrEmpty(sql))
         {
-          Console.WriteLine(sql ?? string.Empty);
+          Console.WriteLine(sql);
         }
       }
     }
