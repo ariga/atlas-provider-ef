@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Target Name="AtlasEFProjectMetadata">
+    <MSBuild Condition=" '$(TargetFramework)' == '' "
+             Targets="AtlasEFProjectMetadata"
+             Projects="$(MSBuildProjectFile)"
+             Properties="TargetFramework=$(TargetFrameworks.Split(';')[0]);OutputFile=$(OutputFile)" />
+    <ItemGroup Condition=" '$(TargetFramework)' != '' ">
+      <ProjectMetadata Include="AssemblyName: $(AssemblyName)" />
+      <ProjectMetadata Include="Language: $(Language)" />
+      <ProjectMetadata Include="OutputPath: $(OutputPath)" />
+      <ProjectMetadata Include="Platform: $(Platform)" />
+      <ProjectMetadata Include="PlatformTarget: $(PlatformTarget)" />
+      <ProjectMetadata Include="ProjectAssetsFile: $(ProjectAssetsFile)" />
+      <ProjectMetadata Include="ProjectDir: $(ProjectDir)" />
+      <ProjectMetadata Include="RootNamespace: $(RootNamespace)" />
+      <ProjectMetadata Include="RuntimeFrameworkVersion: $(RuntimeFrameworkVersion)" />
+      <ProjectMetadata Include="TargetFileName: $(TargetFileName)" />
+      <ProjectMetadata Include="TargetFrameworkMoniker: $(TargetFrameworkMoniker)" />
+      <ProjectMetadata Include="Nullable: $(Nullable)" />
+      <ProjectMetadata Include="TargetFramework: $(TargetFramework)" />
+      <ProjectMetadata Include="TargetPlatformIdentifier: $(TargetPlatformIdentifier)" />
+    </ItemGroup>
+    <WriteLinesToFile Condition=" '$(TargetFramework)' != '' " File="$(OutputFile)" Lines="@(ProjectMetadata)" />
+  </Target>
+</Project>
