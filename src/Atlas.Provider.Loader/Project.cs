@@ -1,6 +1,6 @@
 using System.Diagnostics;
 
-namespace Atlas.Provider.Tools;
+namespace Atlas.Provider.Loader;
 
 internal class Project
 {
@@ -36,11 +36,16 @@ internal class Project
     public string? TargetFramework { get; set; }
     public string? TargetPlatformIdentifier { get; set; }
 
-    public static Project FromFile(string file)
+    public static Project FromFile(
+        string file,
+        string? buildExtensionsDir,
+        string? framework = null,
+        string? configuration = null,
+        string? runtime = null)
     {
         Debug.Assert(!string.IsNullOrEmpty(file), "file is null or empty.");
 
-        var buildExtensionsDir = Path.Combine(Path.GetDirectoryName(file)!, "obj");
+        buildExtensionsDir ??= Path.Combine(Path.GetDirectoryName(file)!, "obj");
         Directory.CreateDirectory(buildExtensionsDir);
         var targetsPath = Path.Combine(buildExtensionsDir, Path.GetFileName(file) + ".atlas-ef.targets");
         using (var input = typeof(Project).Assembly.GetManifestResourceStream("Atlas.Provider.Loader.Resources.AtlasEF.targets")!)
@@ -54,7 +59,19 @@ internal class Project
         try
         {
             var propertyArg = "/property:OutputFile=" + metadataFile;
-            var exitCode = Exe.Run("dotnet", [
+            if (framework != null)
+            {
+                propertyArg += ";TargetFramework=" + framework;
+            }
+            if (configuration != null)
+            {
+                propertyArg += ";Configuration=" + configuration;
+            }
+            if (runtime != null)
+            {
+                propertyArg += ";RuntimeIdentifier=" + runtime;
+            }
+            var exitCode = Executor.Exe.Run("dotnet", [
                 "msbuild",
                 "/target:AtlasEFProjectMetadata",
                 propertyArg,
@@ -74,14 +91,12 @@ internal class Project
         {
             File.Delete(metadataFile);
         }
-
         var platformTarget = metadata["PlatformTarget"];
         if (platformTarget.Length == 0)
         {
             platformTarget = metadata["Platform"];
         }
-
-        return new Project(file, null, null, null)
+        return new Project(file, framework, configuration, runtime)
         {
             AssemblyName = metadata["AssemblyName"],
             Language = metadata["Language"],
@@ -97,6 +112,62 @@ internal class Project
             TargetFramework = metadata["TargetFramework"],
             TargetPlatformIdentifier = metadata["TargetPlatformIdentifier"]
         };
+    }
+
+    public static string? Search(string? dir)
+    {
+        var non = dir == null;
+        if (dir == null)
+        {
+            dir = Directory.GetCurrentDirectory();
+        }
+        else
+        {
+            dir = Path.GetFullPath(dir);
+            if (!Directory.Exists(dir))
+            {
+                return null;
+            }
+        }
+        var projectFiles = Directory.EnumerateFiles(dir, "*.*proj", SearchOption.TopDirectoryOnly)
+            .Where(f => !string.Equals(Path.GetExtension(f), ".xproj", StringComparison.OrdinalIgnoreCase))
+            .Take(2).ToList();
+        if (projectFiles.Count > 1)
+        {
+            throw new InvalidOperationException("Multiple projects in directory");
+        }
+        if (non && projectFiles.Count == 0)
+        {
+            throw new InvalidOperationException("No project in directory");
+        }
+        return projectFiles[0];
+    }
+
+    public static (string, string) ResolveProjects(string? projectDir, string? startupProjectDir)
+    {
+        var project = Search(projectDir);
+        if (projectDir == startupProjectDir)
+        {
+            if (project == null)
+            {
+                throw new InvalidOperationException("No project");
+            }
+            return (project, project);
+        }
+        var startupProject = Search(startupProjectDir);
+        if (startupProject != null && project != null)
+        {
+            return (project, startupProject);
+        }
+        else if (startupProject != null)
+        {
+            return (startupProject, startupProject);
+        }
+        else if (project != null)
+        {
+            return (project, project);
+        }
+        throw new InvalidOperationException("No project");
     }
 
     public void Build()
@@ -121,7 +192,7 @@ internal class Project
         args.Add("/verbosity:quiet");
         args.Add("/nologo");
         args.Add("/p:PublishAot=false"); // Avoid NativeAOT warnings
-        var exitCode = Exe.Run("dotnet", args, interceptOutput: true);
+        var exitCode = Executor.Exe.Run("dotnet", args, interceptOutput: true);
         if (exitCode != 0)
         {
             throw new Exception("Build failed");
