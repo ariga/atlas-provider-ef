@@ -1,14 +1,4 @@
-/*
-Title: Project
-Type: Source Code
-Availability: https://github.com/dotnet/efcore/blob/c50e2f6f1ab8681c9912cdd3443769988160aa31/src/dotnet-ef/Project.cs
-*/
-
-// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-
 using System.Diagnostics;
-using Microsoft.EntityFrameworkCore.Tools.Properties;
 
 namespace Atlas.Provider.Tools;
 
@@ -46,27 +36,16 @@ internal class Project
     public string? TargetFramework { get; set; }
     public string? TargetPlatformIdentifier { get; set; }
 
-    public static Project FromFile(
-        string file,
-        string? buildExtensionsDir = null,
-        string? framework = null,
-        string? configuration = null,
-        string? runtime = null)
+    public static Project FromFile(string file)
     {
         Debug.Assert(!string.IsNullOrEmpty(file), "file is null or empty.");
 
-        buildExtensionsDir ??= Path.Combine(Path.GetDirectoryName(file)!, "obj");
-
+        var buildExtensionsDir = Path.Combine(Path.GetDirectoryName(file)!, "obj");
         Directory.CreateDirectory(buildExtensionsDir);
-
-        var efTargetsPath = Path.Combine(
-            buildExtensionsDir,
-            Path.GetFileName(file) + ".EntityFrameworkCore.targets");
-
-        using (var input = typeof(Resources).Assembly.GetManifestResourceStream(
-                   "Microsoft.EntityFrameworkCore.Tools.Resources.EntityFrameworkCore.targets")!)
-        using (var output = File.OpenWrite(efTargetsPath))
+        var targetsPath = Path.Combine(buildExtensionsDir, Path.GetFileName(file) + ".atlas-ef.targets");
+        using (var input = typeof(Project).Assembly.GetManifestResourceStream("Atlas.Provider.Loader.Resources.AtlasEF.targets")!)
         {
+            using var output = File.OpenWrite(targetsPath);
             input.CopyTo(output);
         }
 
@@ -74,40 +53,21 @@ internal class Project
         var metadataFile = Path.GetTempFileName();
         try
         {
-            var propertyArg = "/property:EFProjectMetadataFile=" + metadataFile;
-            if (framework != null)
-            {
-                propertyArg += ";TargetFramework=" + framework;
-            }
-
-            if (configuration != null)
-            {
-                propertyArg += ";Configuration=" + configuration;
-            }
-
-            if (runtime != null)
-            {
-                propertyArg += ";RuntimeIdentifier=" + runtime;
-            }
-
-            var args = new List<string>
-            {
+            var propertyArg = "/property:OutputFile=" + metadataFile;
+            var exitCode = Exe.Run("dotnet", [
                 "msbuild",
-                "/target:GetEFProjectMetadata",
+                "/target:AtlasEFProjectMetadata",
                 propertyArg,
                 "/verbosity:quiet",
-                "/nologo"
-            };
-
-            args.Add(file);
-
-            var exitCode = Exe.Run("dotnet", args);
+                "/nologo",
+                file,
+            ]);
             if (exitCode != 0)
             {
                 throw new Exception("Metadata extraction failed");
             }
-
-            metadata = File.ReadLines(metadataFile).Select(l => l.Split(new[] { ':' }, 2))
+            metadata = File.ReadLines(metadataFile)
+                .Select(l => l.Split(':', 2))
                 .ToDictionary(s => s[0], s => s[1].TrimStart());
         }
         finally
@@ -121,7 +81,7 @@ internal class Project
             platformTarget = metadata["Platform"];
         }
 
-        return new Project(file, framework, configuration, runtime)
+        return new Project(file, null, null, null)
         {
             AssemblyName = metadata["AssemblyName"],
             Language = metadata["Language"],
@@ -139,38 +99,28 @@ internal class Project
         };
     }
 
-        public void Build()
+    public void Build()
     {
-        var args = new List<string> { "build" };
-
-        if (_file != null)
-        {
-            args.Add(_file);
-        }
-
+        var args = new List<string> { "build", _file };
         // TODO: Only build for the first framework when unspecified
         if (_framework != null)
         {
             args.Add("--framework");
             args.Add(_framework);
         }
-
         if (_configuration != null)
         {
             args.Add("--configuration");
             args.Add(_configuration);
         }
-
         if (_runtime != null)
         {
             args.Add("--runtime");
             args.Add(_runtime);
         }
-
         args.Add("/verbosity:quiet");
         args.Add("/nologo");
         args.Add("/p:PublishAot=false"); // Avoid NativeAOT warnings
-
         var exitCode = Exe.Run("dotnet", args, interceptOutput: true);
         if (exitCode != 0)
         {
