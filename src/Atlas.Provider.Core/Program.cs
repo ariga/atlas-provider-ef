@@ -15,7 +15,8 @@ namespace Atlas.Provider.Core
       string language,
       string framework,
       string workingDir,
-      bool nullable = true
+      bool nullable = true,
+      string[]? args = null
     )
     {
       using var executor = new EFDesign(
@@ -26,7 +27,7 @@ namespace Atlas.Provider.Core
         rootNamespace,
         language,
         nullable,
-        []
+        args
       );
       var types = executor.GetContextTypes();
       foreach (var type in types)
