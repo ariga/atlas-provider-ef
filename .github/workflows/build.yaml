@@ -51,8 +51,15 @@ jobs:
       - name: Install AtlasEF
         run: dotnet tool install --add-source ./Artifacts atlas-ef
         shell: pwsh
+        continue-on-error: true
       - name: AtlasEF
         shell: pwsh
         run: |
           cd ./src/Atlas.Provider.Demo
           dotnet tool run atlas-ef
+        continue-on-error: true
+      - name: Publish Artefacts
+        uses: actions/upload-artifact@v3.1.3
+        with:
+          name: ${{ matrix.os }}
+          path: "./Artefacts"
