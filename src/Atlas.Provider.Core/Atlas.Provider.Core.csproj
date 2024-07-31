@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <OutputPath>..\..\artifacts\bin\$(MSBuildProjectName)\$(Configuration)\</OutputPath>
+    <OutputPath>..\..\artifacts\bin\$(Configuration)\</OutputPath>
     <TargetFramework>net6.0</TargetFramework>
     <Configuration>$(Configuration)</Configuration>
 

@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <OutputPath>..\..\artifacts\bin\$(MSBuildProjectName)\$(Configuration)\</OutputPath>
+    <OutputPath>..\..\artifacts\bin\$(Configuration)\</OutputPath>
     <TargetFramework>net6.0</TargetFramework>
     <Configuration>$(Configuration)</Configuration>
 
@@ -31,10 +31,10 @@
       <NuspecProperty Include="packageType=$(PackageType)" />
       <NuspecProperty Include="targetFramework=$(TargetFramework)" />
       <NuspecProperty Include="SettingsFile=DotnetToolSettings.xml" />
-      <NuspecProperty Include="Output=artifacts/bin/Atlas.Provider.Loader/Release/net6.0/**/*" />
-      <NuspecProperty Include="OutputBinary=artifacts/bin/Atlas.Provider.Core/Release/net6.0/Atlas.Provider.Core.dll" />
-      <NuspecProperty Include="OutputRuntimeConfig=artifacts/bin/Atlas.Provider.Core/Release/net6.0/Atlas.Provider.Core.runtimeconfig.json" />
-      <NuspecProperty Include="OutputSymbol=artifacts/bin/Atlas.Provider.Core/Release/net6.0/Atlas.Provider.Core.pdb" />
+      <NuspecProperty Include="Output=artifacts/bin/Release/net6.0/**/*" />
+      <NuspecProperty Include="OutputBinary=artifacts/bin/Release/net6.0/Atlas.Provider.Core.dll" />
+      <NuspecProperty Include="OutputRuntimeConfig=artifacts/bin/Release/net6.0/Atlas.Provider.Core.runtimeconfig.json" />
+      <NuspecProperty Include="OutputSymbol=artifacts/bin/Release/net6.0/Atlas.Provider.Core.pdb" />
     </ItemGroup>
   </Target>
   <Target Name="BuildOtherPlatforms" AfterTargets="Build" Condition=" '$(TargetFramework)' == 'net461' And '$(Platform)' == 'AnyCPU' ">
