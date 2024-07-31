@@ -54,7 +54,7 @@ jobs:
       - name: Print SQL from Demo project
         shell: pwsh
         working-directory: ./src/Atlas.Provider.Demo
-        run: dotnet atlas-ef
+        run: dotnet atlas-ef -- sqlserver
       - name: Publish artifacts
         uses: actions/upload-artifact@v3.1.3
         with:
