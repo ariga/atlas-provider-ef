@@ -16,9 +16,9 @@ CREATE TABLE [Post] (
     [PostId] int NOT NULL IDENTITY,
     [Title] nvarchar(max) NOT NULL,
     [Content] nvarchar(max) NOT NULL,
-    [BlogUrl] varchar(200) NOT NULL,
+    [BlogUrl] varchar(200) NULL,
     CONSTRAINT [PK_Post] PRIMARY KEY ([PostId]),
-    CONSTRAINT [FK_Post_Blogs_BlogUrl] FOREIGN KEY ([BlogUrl]) REFERENCES [Blogs] ([Url]) ON DELETE CASCADE
+    CONSTRAINT [FK_Post_Blogs_BlogUrl] FOREIGN KEY ([BlogUrl]) REFERENCES [Blogs] ([Url])
 );
 GO
 

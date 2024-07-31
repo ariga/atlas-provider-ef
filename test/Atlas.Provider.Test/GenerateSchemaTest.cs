@@ -2,7 +2,6 @@
 using System.Diagnostics;
 using System.Reflection;
 
-
 public class GenerateSchemaTest
 {
   [Theory]
@@ -29,7 +28,6 @@ public class GenerateSchemaTest
     Assert.NotNull(process);
     string output = process.StandardOutput.ReadToEnd();
     string error = process.StandardError.ReadToEnd();
-    File.WriteAllText(Path.Combine(Directory.GetCurrentDirectory(), $"{providerName}.sql"), output);
     process.WaitForExit();
     Assert.Equal(FileReader.Read(expectedFile), output);
     Assert.Equal("", error);

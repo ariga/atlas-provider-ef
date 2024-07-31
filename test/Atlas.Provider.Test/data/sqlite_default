@@ -13,8 +13,8 @@ CREATE TABLE "Post" (
     "PostId" INTEGER NOT NULL CONSTRAINT "PK_Post" PRIMARY KEY AUTOINCREMENT,
     "Title" TEXT NOT NULL,
     "Content" TEXT NOT NULL,
-    "BlogUrl" varchar(200) NOT NULL,
-    CONSTRAINT "FK_Post_Blogs_BlogUrl" FOREIGN KEY ("BlogUrl") REFERENCES "Blogs" ("Url") ON DELETE CASCADE
+    "BlogUrl" varchar(200) NULL,
+    CONSTRAINT "FK_Post_Blogs_BlogUrl" FOREIGN KEY ("BlogUrl") REFERENCES "Blogs" ("Url")
 );
 
 

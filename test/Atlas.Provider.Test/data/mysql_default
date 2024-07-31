@@ -17,9 +17,9 @@ CREATE TABLE `Post` (
     `PostId` int NOT NULL AUTO_INCREMENT,
     `Title` longtext CHARACTER SET utf8mb4 NOT NULL,
     `Content` longtext CHARACTER SET utf8mb4 NOT NULL,
-    `BlogUrl` varchar(200) CHARACTER SET utf8mb4 NOT NULL,
+    `BlogUrl` varchar(200) CHARACTER SET utf8mb4 NULL,
     CONSTRAINT `PK_Post` PRIMARY KEY (`PostId`),
-    CONSTRAINT `FK_Post_Blogs_BlogUrl` FOREIGN KEY (`BlogUrl`) REFERENCES `Blogs` (`Url`) ON DELETE CASCADE
+    CONSTRAINT `FK_Post_Blogs_BlogUrl` FOREIGN KEY (`BlogUrl`) REFERENCES `Blogs` (`Url`)
 ) CHARACTER SET=utf8mb4;
 
 

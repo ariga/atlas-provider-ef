@@ -19,7 +19,7 @@ namespace DemoNamespace
         {
             var provider = args.FirstOrDefault();
 
-            return new BloggingContext(provider);
+            return new BloggingContext(provider!);
         }
     }
     public class BloggingContext : DbContext
