@@ -3,7 +3,7 @@ var configuration =
   HasArgument("Configuration") ? Argument<string>("Configuration") :
   EnvironmentVariable("Configuration", "Release");
 
-var artifactsDirectory = Directory("./Artifacts");
+var artifactsDirectory = Directory("./artifacts");
 
 Task("Clean")
   .Description("Cleans the artifacts, bin and obj directories.")
