@@ -1,0 +1,29 @@
+ALTER DATABASE CHARACTER SET utf8mb4;
+
+
+CREATE TABLE `Blogs` (
+    `BlogId` int NOT NULL AUTO_INCREMENT,
+    `Url` varchar(200) CHARACTER SET utf8mb4 NOT NULL,
+    `Rating` decimal(5,2) NOT NULL,
+    `Title` longtext CHARACTER SET utf8mb4 NOT NULL,
+    `Content` longtext CHARACTER SET utf8mb4 NOT NULL,
+    `Author` varchar(200) CHARACTER SET utf8mb4 NOT NULL DEFAULT 'Anonymous',
+    CONSTRAINT `PK_Blogs` PRIMARY KEY (`BlogId`),
+    CONSTRAINT `AK_Blogs_Url` UNIQUE (`Url`)
+) CHARACTER SET=utf8mb4;
+
+
+CREATE TABLE `Post` (
+    `PostId` int NOT NULL AUTO_INCREMENT,
+    `Title` longtext CHARACTER SET utf8mb4 NOT NULL,
+    `Content` longtext CHARACTER SET utf8mb4 NOT NULL,
+    `BlogUrl` varchar(200) CHARACTER SET utf8mb4 NULL,
+    CONSTRAINT `PK_Post` PRIMARY KEY (`PostId`),
+    CONSTRAINT `FK_Post_Blogs_BlogUrl` FOREIGN KEY (`BlogUrl`) REFERENCES `Blogs` (`Url`)
+) CHARACTER SET=utf8mb4;
+
+
+CREATE INDEX `IX_Post_BlogUrl` ON `Post` (`BlogUrl`);
+
+
+

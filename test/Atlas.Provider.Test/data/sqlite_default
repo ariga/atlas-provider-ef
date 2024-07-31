@@ -1,0 +1,24 @@
+CREATE TABLE "Blogs" (
+    "BlogId" INTEGER NOT NULL CONSTRAINT "PK_Blogs" PRIMARY KEY AUTOINCREMENT,
+    "Url" varchar(200) NOT NULL,
+    "Rating" decimal(5, 2) NOT NULL,
+    "Title" TEXT NOT NULL,
+    "Content" TEXT NOT NULL,
+    "Author" TEXT NOT NULL DEFAULT 'Anonymous',
+    CONSTRAINT "AK_Blogs_Url" UNIQUE ("Url")
+);
+
+
+CREATE TABLE "Post" (
+    "PostId" INTEGER NOT NULL CONSTRAINT "PK_Post" PRIMARY KEY AUTOINCREMENT,
+    "Title" TEXT NOT NULL,
+    "Content" TEXT NOT NULL,
+    "BlogUrl" varchar(200) NULL,
+    CONSTRAINT "FK_Post_Blogs_BlogUrl" FOREIGN KEY ("BlogUrl") REFERENCES "Blogs" ("Url")
+);
+
+
+CREATE INDEX "IX_Post_BlogUrl" ON "Post" ("BlogUrl");
+
+
+

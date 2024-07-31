@@ -47,12 +47,12 @@ namespace Atlas.Provider.Core
           continue;
         }
         var sql = executor.ScriptDbContext(name);
-        if (ctxInfo["ProviderName"]!.ToString()!.EndsWith("SqlServer"))
-        {
-          sql = "-- atlas:delimiter GO \n" + sql;
-        }
         if (!string.IsNullOrEmpty(sql))
         {
+          if (ctxInfo["ProviderName"]!.ToString()!.EndsWith("SqlServer"))
+          {
+            Console.WriteLine("-- atlas:delimiter GO");
+          }
           Console.WriteLine(sql);
         }
       }

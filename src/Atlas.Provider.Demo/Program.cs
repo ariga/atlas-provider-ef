@@ -19,12 +19,12 @@ namespace DemoNamespace
         {
             var provider = args.FirstOrDefault();
 
-            return new BloggingContext(provider);
+            return new BloggingContext(provider!);
         }
     }
     public class BloggingContext : DbContext
     {
-        public DbSet<Blog> Blogs { get; set; }
+        public DbSet<Blog>? Blogs { get; set; }
 
         private readonly string _provider;
         public BloggingContext(string provider = "SqlServer")
@@ -79,14 +79,14 @@ namespace DemoNamespace
         public int BlogId { get; set; }
 
         [Column(TypeName = "varchar(200)")]
-        public string Url { get; set; }
+        public string? Url { get; set; }
 
         [Column(TypeName = "decimal(5, 2)")]
         public decimal Rating { get; set; }
         public string Title { get; set; } = string.Empty;
         public string Content { get; set; } = string.Empty;
         public string Author { get; set; } = string.Empty;
-        public List<Post> Posts { get; set; }
+        public List<Post>? Posts { get; set; }
     }
 
     public class Post
@@ -95,7 +95,7 @@ namespace DemoNamespace
         public int PostId { get; set; }
         public string Title { get; set; } = string.Empty;
         public string Content { get; set; } = string.Empty;
-        public string BlogUrl { get; set; }
-        public Blog Blog { get; set; }
+        public string? BlogUrl { get; set; }
+        public Blog? Blog { get; set; }
     }
 }
