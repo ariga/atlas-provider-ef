@@ -37,6 +37,10 @@
       <NuspecProperty Include="OutputSymbol=artifacts/bin/Atlas.Provider.Core/Release/net6.0/Atlas.Provider.Core.pdb" />
     </ItemGroup>
   </Target>
+  <Target Name="BuildOtherPlatforms" AfterTargets="Build" Condition=" '$(TargetFramework)' == 'net461' And '$(Platform)' == 'AnyCPU' ">
+    <MSBuild Projects="$(MSBuildProjectFullPath)" Properties="TargetFramework=$(TargetFramework);Platform=x86;Configuration=$(Configuration)" Targets="Build" />
+    <MSBuild Projects="$(MSBuildProjectFullPath)" Properties="TargetFramework=$(TargetFramework);Platform=ARM64;Configuration=$(Configuration)" Targets="Build" />
+  </Target>
   <ItemGroup>
     <None Include="DotnetToolSettings.xml" Pack="true" PackagePath="tools\netcoreapp2.1\any" />
     <ProjectReference Include="../Atlas.Provider.Core/Atlas.Provider.Core.csproj" ReferenceOutputAssembly="false" />
