@@ -71,7 +71,7 @@ internal class Project
             {
                 propertyArg += ";RuntimeIdentifier=" + runtime;
             }
-            var exitCode = Executor.Exe.Run("dotnet", [
+            var exitCode = Exe.Run("dotnet", [
                 "msbuild",
                 "/target:AtlasEFProjectMetadata",
                 propertyArg,
@@ -192,7 +192,8 @@ internal class Project
         args.Add("/verbosity:quiet");
         args.Add("/nologo");
         args.Add("/p:PublishAot=false"); // Avoid NativeAOT warnings
-        var exitCode = Executor.Exe.Run("dotnet", args, interceptOutput: true);
+        // Discard the build output, but show the errors
+        var exitCode = Exe.Run("dotnet", args, handleOutput: delegate(string? line) {});
         if (exitCode != 0)
         {
             throw new Exception("Build failed");
