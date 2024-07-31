@@ -1,7 +1,5 @@
 using System;
 using System.Linq;
-using System.CodeDom.Compiler;
-using System.Text;
 
 namespace Atlas.Provider.Core.Executor;
 
@@ -27,50 +25,6 @@ internal static class Reporter
         if (IsVerbose)
         {
             WriteLine(Prefix("verbose: ", message));
-        }
-    }
-
-    public static void Write(CompilerError error)
-    {
-        var builder = new StringBuilder();
-
-        if (!string.IsNullOrEmpty(error.FileName))
-        {
-            builder.Append(error.FileName);
-
-            if (error.Line > 0)
-            {
-                builder
-                    .Append("(")
-                    .Append(error.Line);
-
-                if (error.Column > 0)
-                {
-                    builder
-                        .Append(",")
-                        .Append(error.Column);
-                }
-
-                builder.Append(")");
-            }
-
-            builder.Append(" : ");
-        }
-
-        builder
-            .Append(error.IsWarning ? "warning" : "error")
-            .Append(" ")
-            .Append(error.ErrorNumber)
-            .Append(": ")
-            .AppendLine(error.ErrorText);
-
-        if (error.IsWarning)
-        {
-            WriteWarning(builder.ToString());
-        }
-        else
-        {
-            WriteError(builder.ToString());
         }
     }
 
