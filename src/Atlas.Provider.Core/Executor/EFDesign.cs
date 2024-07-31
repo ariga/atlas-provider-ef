@@ -37,7 +37,7 @@ internal class EFDesign : IDisposable
     string? rootNamespace,
     string? language,
     bool nullable,
-    string[] remainingArguments
+    string[]? remainingArguments
   )
   {
     _commandsAssembly = Assembly.Load(new AssemblyName { Name = DesignAssemblyName });
