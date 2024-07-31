@@ -1,6 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
+    <Version>0.0.1</Version>
+    <Authors>ariga</Authors>
+    <Description>Atlas Provider for EntityFramework</Description>
+
     <OutputType>Exe</OutputType>
     <OutputPath>..\..\artifacts\bin\$(MSBuildProjectName)\$(Configuration)\</OutputPath>
     <TargetFramework>net6.0</TargetFramework>
@@ -15,31 +18,17 @@
 
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>atlas-ef</ToolCommandName>
-    <PackageOutputPath>..\..\artifacts\nupkg</PackageOutputPath>
-    <NuspecFile>$(MSBuildProjectName).nuspec</NuspecFile>
-    <!-- Because this project uses a custom nuspec, this is necessary to ensure the generated shims are in the publish directory. -->
-    <PackagedShimOutputRootDirectory>$(OutDir)</PackagedShimOutputRootDirectory>
+    <!-- Nuspec -->
+    <PackageId>atlas-ef</PackageId>
+    <PackageProjectUrl>https://github.com/ariga/atlas-provider-ef</PackageProjectUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <PackageOutputPath>..\..\artifacts</PackageOutputPath>
   </PropertyGroup>
-  <Target Name="SetPackageProperties" BeforeTargets="InitializeStandardNuspecProperties" DependsOnTargets="BuiltProjectOutputGroup;DebugSymbolsProjectOutputGroup">
-    <PropertyGroup>
-      <!-- Make sure we create a symbols.nupkg. -->
-      <IncludeSymbols>true</IncludeSymbols>
-      <!-- Ensure PublishDir is set -->
-      <PublishDir>$(OutputPath)</PublishDir>
-    </PropertyGroup>
-    <ItemGroup>
-      <NuspecProperty Include="packageType=$(PackageType)" />
-      <NuspecProperty Include="targetFramework=$(TargetFramework)" />
-      <NuspecProperty Include="SettingsFile=DotnetToolSettings.xml" />
-      <NuspecProperty Include="Output=artifacts/bin/Atlas.Provider.Loader/Release/net6.0/**/*" />
-      <NuspecProperty Include="OutputBinary=artifacts/bin/Atlas.Provider.Core/Release/net6.0/Atlas.Provider.Core.dll" />
-      <NuspecProperty Include="OutputRuntimeConfig=artifacts/bin/Atlas.Provider.Core/Release/net6.0/Atlas.Provider.Core.runtimeconfig.json" />
-      <NuspecProperty Include="OutputSymbol=artifacts/bin/Atlas.Provider.Core/Release/net6.0/Atlas.Provider.Core.pdb" />
-    </ItemGroup>
-  </Target>
   <ItemGroup>
-    <None Include="DotnetToolSettings.xml" Pack="true" PackagePath="tools\netcoreapp2.1\any" />
-    <ProjectReference Include="../Atlas.Provider.Core/Atlas.Provider.Core.csproj" ReferenceOutputAssembly="false" />
+    <None Include="..\..\LICENSE" Pack="true" PackagePath=""/>
+    <None Include="..\..\README.md" Pack="true" PackagePath=""/>
+    <ProjectReference Include="..\Atlas.Provider.Core\Atlas.Provider.Core.csproj" ReferenceOutputAssembly="true" />
     <EmbeddedResource Include="Resources\AtlasEF.targets" />
     <PackageReference Include="System.CommandLine.DragonFruit" Version="0.4.0-alpha.22272.1" />
   </ItemGroup>
