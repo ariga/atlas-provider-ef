@@ -49,7 +49,7 @@ namespace Atlas.Provider.Core
         var sql = executor.ScriptDbContext(name);
         if (ctxInfo["ProviderName"]!.ToString()!.EndsWith("SqlServer"))
         {
-          sql = "-- atlas:delimiter GO \n" + sql;
+          Console.WriteLine("-- atlas:delimiter GO");
         }
         if (!string.IsNullOrEmpty(sql))
         {

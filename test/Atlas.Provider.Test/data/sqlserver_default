@@ -1,4 +1,4 @@
--- atlas:delimiter GO 
+-- atlas:delimiter GO
 CREATE TABLE [Blogs] (
     [BlogId] int NOT NULL IDENTITY,
     [Url] varchar(200) NOT NULL,
