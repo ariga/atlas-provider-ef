@@ -36,22 +36,21 @@ namespace DemoNamespace
             switch (_provider.ToLower())
             {
                 case "sqlserver":
-                    options.UseSqlServer("foo");
+                    options.UseSqlServer("Server=localhost;Database=YourDatabaseName;User Id=your_username;Password=your_password;");
                     break;
                 case "sqlite":
-                    options.UseSqlite("foo");
+                    options.UseSqlite("Data Source=localdatabase.db;");
                     break;
                 case "mysql":
-                    options.UseMySql(ServerVersion.Create(8, 0, 0, ServerType.MySql));
+                    options.UseMySql("Server=localhost;Database=YourDatabaseName;User=root;Password=your_password;", ServerVersion.Create(8, 0, 0, ServerType.MySql));
                     break;
                 case "mariadb":
-                    options.UseMySql(ServerVersion.Create(8, 7, 0, ServerType.MariaDb));
+                    options.UseMySql("Server=localhost;Database=YourDatabaseName;User=root;Password=your_password;", ServerVersion.Create(8, 7, 0, ServerType.MariaDb));
                     break;
                 case "postgres":
-                    options.UseNpgsql("foo");
+                    options.UseNpgsql("Host=localhost;Database=YourDatabaseName;Username=your_username;Password=your_password;");
                     break;
             }
-
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
