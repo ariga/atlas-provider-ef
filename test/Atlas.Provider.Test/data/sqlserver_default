@@ -1,0 +1,30 @@
+-- atlas:delimiter GO 
+CREATE TABLE [Blogs] (
+    [BlogId] int NOT NULL IDENTITY,
+    [Url] varchar(200) NOT NULL,
+    [Rating] decimal(5,2) NOT NULL,
+    [Title] nvarchar(max) NOT NULL,
+    [Content] nvarchar(max) NOT NULL,
+    [Author] nvarchar(200) NOT NULL DEFAULT N'Anonymous',
+    CONSTRAINT [PK_Blogs] PRIMARY KEY ([BlogId]),
+    CONSTRAINT [AK_Blogs_Url] UNIQUE ([Url])
+);
+GO
+
+
+CREATE TABLE [Post] (
+    [PostId] int NOT NULL IDENTITY,
+    [Title] nvarchar(max) NOT NULL,
+    [Content] nvarchar(max) NOT NULL,
+    [BlogUrl] varchar(200) NOT NULL,
+    CONSTRAINT [PK_Post] PRIMARY KEY ([PostId]),
+    CONSTRAINT [FK_Post_Blogs_BlogUrl] FOREIGN KEY ([BlogUrl]) REFERENCES [Blogs] ([Url]) ON DELETE CASCADE
+);
+GO
+
+
+CREATE INDEX [IX_Post_BlogUrl] ON [Post] ([BlogUrl]);
+GO
+
+
+

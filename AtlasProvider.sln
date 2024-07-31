@@ -9,6 +9,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Atlas.Provider.Loader", "sr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Atlas.Provider.Core", "src\Atlas.Provider.Core\Atlas.Provider.Core.csproj", "{FAEB024F-B0AA-4B7C-A820-68E497657D0D}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{A0F935A4-52B6-4790-AA08-A86E0CB562E9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Atlas.Provider.Test", "test\Atlas.Provider.Test\Atlas.Provider.Test.csproj", "{D34350D9-C254-4187-A908-00EA03DDE2B5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -26,9 +30,14 @@ Global
 		{FAEB024F-B0AA-4B7C-A820-68E497657D0D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FAEB024F-B0AA-4B7C-A820-68E497657D0D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FAEB024F-B0AA-4B7C-A820-68E497657D0D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D34350D9-C254-4187-A908-00EA03DDE2B5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D34350D9-C254-4187-A908-00EA03DDE2B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D34350D9-C254-4187-A908-00EA03DDE2B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D34350D9-C254-4187-A908-00EA03DDE2B5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{003BD0CC-7AF6-408C-A40D-3FE8F6C73537} = {C41D6C7A-456B-4A0B-ACE1-9931DA092288}
 		{FAEB024F-B0AA-4B7C-A820-68E497657D0D} = {C41D6C7A-456B-4A0B-ACE1-9931DA092288}
+		{D34350D9-C254-4187-A908-00EA03DDE2B5} = {A0F935A4-52B6-4790-AA08-A86E0CB562E9}
 	EndGlobalSection
 EndGlobal
