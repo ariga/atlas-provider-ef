@@ -35,16 +35,16 @@ Task("Build")
   });
 
 Task("Test")
-    .Description("Runs unit tests")
-    .DoesForEach(
-      GetFiles("./test/**/*.csproj"),
-      project =>
+  .Description("Runs unit tests")
+  .DoesForEach(
+    GetFiles("./test/**/*.csproj"),
+    project =>
+    {
+      DotNetTest(project.ToString(),new DotNetTestSettings()
       {
-        DotNetTest(project.ToString(),new DotNetTestSettings()
-        {
-          Configuration = configuration,
-        });
-    }).DeferOnError();
+        Configuration = configuration,
+      });
+  }).DeferOnError();
 
 Task("Pack")
   .Description("Creates NuGet packages and outputs them to the artifacts directory.")
