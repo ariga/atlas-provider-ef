@@ -12,6 +12,6 @@
   </metadata>
   <files>
     <file src="DotnetToolSettings.xml" target="tools\net6.0\any" />
-    <file src="../../artifacts/bin/Release/net6.0/**/*" target="tools\net6.0\any" />
+    <file src="../../artifacts/bin/Release/net6.0/*" target="tools\net6.0\any" />
   </files>
 </package>
