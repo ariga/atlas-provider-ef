@@ -28,7 +28,7 @@ dotnet new tool-manifest
 Install the `AtlasEF` package from the command line:
 
 ```bash
-dotnet tool install atlas-ef --version 0.0.1
+dotnet tool install atlas-ef
 ```
 
 Let's check if the tool is installed correctly:
