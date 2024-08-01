@@ -73,11 +73,11 @@ jobs:
       pull-requests: write
     runs-on: ubuntu-latest
     steps:
-      - name: "Download Artifacts"
+      - name: Download Artifacts
         uses: actions/download-artifact@v3.0.2
         with:
           path: "./artifacts"
-      - name: "Publish Test Summary"
+      - name: Publish Test Summary
         uses: test-summary/action@v2
         if: always()
         with:

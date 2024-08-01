@@ -47,6 +47,7 @@ Task("Test")
       {
         $"trx;LogFileName={project.GetFilenameWithoutExtension()}.trx",
         $"html;LogFileName={project.GetFilenameWithoutExtension()}.html",
+        $"junit;LogFileName={project.GetFilenameWithoutExtension()}.xml",
       },
       NoBuild = true,
       NoRestore = true,
@@ -75,6 +76,7 @@ Task("Pack")
 Task("Default")
   .Description("Cleans, restores NuGet packages, builds the solution, runs unit tests and then creates NuGet packages.")
   .IsDependentOn("Build")
+  .IsDependentOn("Test")
   .IsDependentOn("Pack");
 
 RunTarget(target);
