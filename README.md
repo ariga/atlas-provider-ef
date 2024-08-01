@@ -93,6 +93,8 @@ your current EF schema. This works by inspecting the target database and compari
 EF schema and creating a migration plan. Atlas will prompt you to confirm the migration plan
 before applying it to the database.
 
+> Note: For Windows users, you need to use the `atlas.exe` command instead of `atlas`.
+
 ```bash
 atlas schema apply --env ef -u "mysql://root:password@localhost:3306/mydb"
 ```
@@ -106,6 +108,8 @@ Atlas supports a [versioned migration](https://atlasgo.io/concepts/declarative-v
 workflow, where each change to the database is versioned and recorded in a migration file. You can use the
 `atlas migrate diff` command to automatically generate a migration file that will migrate the database
 from its latest revision to the current EF schema.
+
+> Note: For Windows users, you need to use the `atlas.exe` command instead of `atlas`.
 
 ```bash
 atlas migrate diff --env ef 
