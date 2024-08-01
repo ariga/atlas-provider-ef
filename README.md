@@ -9,7 +9,18 @@ Load [Entity Framework](https://learn.microsoft.com/en-us/ef/) schemas into an [
 
 ## Installation
 
-Install Atlas from macOS or Linux by running:
+**Windows:**
+
+Use Power Shell command to download the file:
+
+```powershell
+Invoke-WebRequest https://release.ariga.io/atlas/atlas-windows-amd64-latest.exe -OutFile atlas.exe
+```
+
+Then move the atlas binary to a file location on your system PATH.
+
+**macOS + Linux:**
+
 ```bash
 curl -sSf https://atlasgo.sh | sh
 ```
