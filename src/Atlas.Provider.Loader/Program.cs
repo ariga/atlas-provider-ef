@@ -90,7 +90,7 @@ namespace Atlas.Provider.Loader
                 arguments.Add("--nullable");
             }
             // dotnet exec [runtime-options] [path-to-application] [arguments]
-            Executor.Exe.Run("dotnet", [
+            Exe.Run("dotnet", [
                 "exec",
                 .. runtimeOpts,
                 Path.Combine(loaderDirPath!, AssemblyName + ".dll"),
