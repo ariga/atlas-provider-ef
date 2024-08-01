@@ -73,7 +73,7 @@ env "ef" {
 
 Once you have the provider tool and Atlas configured, you can use it to manage your database schema.
 
-##### Apply
+#### Apply
 
 You can use the `atlas schema apply` command to plan and apply a migration of your database to
 your current EF schema. This works by inspecting the target database and comparing it to the
@@ -87,7 +87,7 @@ atlas schema apply --env ef -u "mysql://root:password@localhost:3306/mydb"
 Where the `-u` flag accepts the [URL](https://atlasgo.io/concepts/url) to the
 target database.
 
-##### Diff
+#### Diff
 
 Atlas supports a [versioned migration](https://atlasgo.io/concepts/declarative-vs-versioned#versioned-migrations) 
 workflow, where each change to the database is versioned and recorded in a migration file. You can use the
