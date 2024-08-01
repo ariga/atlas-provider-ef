@@ -1,5 +1,7 @@
 # Atlas Provider for Entity Framework Core
 
+[![AtlasEF NuGet Package](https://img.shields.io/nuget/v/atlas-ef.svg)](https://www.nuget.org/packages/atlas-ef/) 
+
 Load [Entity Framework](https://learn.microsoft.com/en-us/ef/) schemas into an [Atlas](https://atlasgo.io) project.
 
 ## Use-cases
