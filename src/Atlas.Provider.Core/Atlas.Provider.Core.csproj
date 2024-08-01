@@ -2,7 +2,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <OutputPath>..\..\artifacts\bin\$(MSBuildProjectName)\$(Configuration)\</OutputPath>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFrameworks>netcoreapp2.1;net6.0;net8.0</TargetFrameworks>
     <Configuration>$(Configuration)</Configuration>
 
     <RootNamespace>Atlas.Provider.Core</RootNamespace>

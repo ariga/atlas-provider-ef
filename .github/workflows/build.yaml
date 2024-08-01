@@ -39,6 +39,7 @@ jobs:
           dotnet-version: |
             6.0.x
             8.0.x
+            2.1
       - name: Dotnet Tool Restore
         shell: pwsh
         run: dotnet tool restore
