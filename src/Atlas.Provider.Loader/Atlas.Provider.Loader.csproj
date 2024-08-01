@@ -29,7 +29,6 @@
     <PropertyGroup Label="Build">
       <MinVerTagPrefix>v</MinVerTagPrefix>
       <MinVerVerbosity>normal</MinVerVerbosity>
-      <MinVerIgnoreHeight>true</MinVerIgnoreHeight>
     </PropertyGroup>
   </Target>
   <ItemGroup>
