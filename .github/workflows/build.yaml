@@ -97,13 +97,12 @@ jobs:
       - name: Download Artifact
         uses: actions/download-artifact@v3.0.2
         with:
-          name: "windows-latest"
+          name: windows-latest
       - name: Dotnet NuGet Add Source
         shell: pwsh
-        run: dotnet nuget add source https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json \
-          --name GitHub \
-          --username ${{ github.repository_owner }} \
-          --password ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          dotnet nuget add source https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json `
+            --name GitHub --username ${{ github.repository_owner }} --password ${{ secrets.GITHUB_TOKEN }}
       - name: Dotnet NuGet Push
         shell: pwsh
         run: dotnet nuget push .\*.nupkg --api-key ${{ github.token }} --source GitHub --skip-duplicate
@@ -120,7 +119,7 @@ jobs:
       - name: Download Artifact
         uses: actions/download-artifact@v3.0.2
         with:
-          name: "windows-latest"
+          name: windows-latest
       - name: Dotnet NuGet Push
         shell: pwsh
         run: |
