@@ -6,20 +6,20 @@ Load [Entity Framework](https://learn.microsoft.com/en-us/ef/) schemas into an [
 
 ## Use-cases
 
-1. **Declarative migrations** - use a Terraform-like `atlas schema apply --env ef` to apply your EF schema to the database.
+1. **Declarative migrations** - use a Terraform-like `atlas schema apply --env ef` command to apply your EF schema to the database.
 2. **Automatic migration planning** - use `atlas migrate diff --env ef` to automatically plan a migration from the current database version to the EF schema.
 
 ## Installation
 
 **Windows:**
 
-Use Power Shell command to download the file:
+Use PowerShell  to download the file:
 
 ```powershell
 Invoke-WebRequest https://release.ariga.io/atlas/atlas-windows-amd64-latest.exe -OutFile atlas.exe
 ```
 
-Then move the atlas binary to a file location on your system PATH.
+Then move the Atlas binary to a file location on your system PATH.
 
 **macOS + Linux:**
 
@@ -51,7 +51,7 @@ dotnet atlas-ef --version
 
 ## Configuration
 
-By default, this tool will scan for implementation of the **DbContext** class in the current project and generate a database schema based on them.
+By default, this tool will scan for implementation of the **DbContext** class in the current project and will generate a database schema based on it.
 
 This tool does not require a database connection, but it does need [Database Providers](https://learn.microsoft.com/en-us/ef/core/providers/?tabs=dotnet-core-cli) restored.
 
@@ -88,9 +88,9 @@ Once you have the provider tool and Atlas configured, you can use them to manage
 
 #### Apply
 
-You can use the `atlas schema apply` command to plan and apply a migration of your database to
-your current EF schema. This works by inspecting the target database and comparing it to the
-EF schema and creating a migration plan. Atlas will prompt you to confirm the migration plan
+You can use the `atlas schema apply` command to plan and apply a migration on your database from
+your current EF schema. This works by inspecting the target database schema and comparing it to the
+EF schema, creating a migration plan. Atlas will prompt you to confirm the migration plan
 before applying it to the database.
 
 > Note: For Windows users, you need to use the `atlas.exe` command instead of `atlas`.
@@ -99,7 +99,7 @@ before applying it to the database.
 atlas schema apply --env ef -u "mysql://root:password@localhost:3306/mydb"
 ```
 
-Where the `-u` flag accepts the [URL](https://atlasgo.io/concepts/url) to the
+The `-u` flag accepts the [URL](https://atlasgo.io/concepts/url) to the
 target database.
 
 #### Diff
