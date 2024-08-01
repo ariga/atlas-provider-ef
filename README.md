@@ -34,7 +34,7 @@ dotnet tool install atlas-ef --version 0.0.1
 Let's check if the tool is installed correctly:
 
 ```bash
-atlas-ef --version
+dotnet atlas-ef --version
 ```
 
 ## Configuration
@@ -71,7 +71,7 @@ env "ef" {
 
 ### Usage
 
-Once you have the provider tool and Atlas configured, you can use it to manage your database schema.
+Once you have the provider tool and Atlas configured, you can use them to manage your database schema.
 
 #### Apply
 
