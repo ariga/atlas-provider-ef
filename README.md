@@ -5,8 +5,7 @@ Load [Entity Framework](https://learn.microsoft.com/en-us/ef/) schemas into an [
 ## Use-cases
 
 1. **Declarative migrations** - use a Terraform-like `atlas schema apply --env ef` to apply your EF schema to the database.
-2. **Automatic migration planning** - use `atlas migrate diff --env ef` to automatically plan a migration from  
-  the current database version to the EF schema.
+2. **Automatic migration planning** - use `atlas migrate diff --env ef` to automatically plan a migration from the current database version to the EF schema.
 
 ## Installation
 
