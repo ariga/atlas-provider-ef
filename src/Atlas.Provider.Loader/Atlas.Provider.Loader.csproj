@@ -25,10 +25,18 @@
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageOutputPath>..\..\artifacts</PackageOutputPath>
   </PropertyGroup>
+  <Target Name="Versioning" BeforeTargets="MinVer">
+    <PropertyGroup Label="Build">
+      <MinVerTagPrefix>v</MinVerTagPrefix>
+      <MinVerVerbosity>normal</MinVerVerbosity>
+      <MinVerIgnoreHeight>true</MinVerIgnoreHeight>
+    </PropertyGroup>
+  </Target>
   <ItemGroup>
-    <None Include="..\..\LICENSE" Pack="true" PackagePath=""/>
-    <None Include="..\..\README.md" Pack="true" PackagePath=""/>
+    <None Include="..\..\LICENSE" Pack="true" PackagePath="" />
+    <None Include="..\..\README.md" Pack="true" PackagePath="" />
     <ProjectReference Include="..\Atlas.Provider.Core\Atlas.Provider.Core.csproj" ReferenceOutputAssembly="true" />
+    <PackageReference Include="MinVer" Version="5.0.0" PrivateAssets="all" />
     <EmbeddedResource Include="Resources\AtlasEF.targets" />
     <PackageReference Include="System.CommandLine.DragonFruit" Version="0.4.0-alpha.22272.1" />
   </ItemGroup>
