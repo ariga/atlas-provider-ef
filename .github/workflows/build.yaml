@@ -18,7 +18,7 @@ env:
   # Disable sending .NET CLI telemetry to Microsoft.
   DOTNET_CLI_TELEMETRY_OPTOUT: true
   # Set the build number in MinVer.
-  MINVERBUILDMETADATA: build.${{github.run_number}}
+  MINVERBUILDMETADATA: build.${{ github.run_number }}
 
 jobs:
   build:
@@ -53,7 +53,7 @@ jobs:
         run: dotnet cake --target=Pack
       - name: Install AtlasEF
         shell: pwsh
-        run: dotnet tool install --add-source ./artifacts atlas-ef
+        run: dotnet tool install --prerelease --add-source ./artifacts atlas-ef
       - name: Print SQL from Demo project
         shell: pwsh
         working-directory: ./src/Atlas.Provider.Demo
