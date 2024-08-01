@@ -63,3 +63,69 @@ jobs:
         with:
           name: ${{ matrix.os }}
           path: "./artifacts"
+
+  publish-test-results:
+    name: Publish Tests Results
+    needs: build
+    if: always()
+    permissions:
+      checks: write
+      pull-requests: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Download Artifacts"
+        uses: actions/download-artifact@v3.0.2
+        with:
+          path: "./artifacts"
+      - name: "Publish Test Summary"
+        uses: test-summary/action@v2
+        if: always()
+        with:
+          paths: "./artifacts/*/*.xml"
+
+  push-github-packages:
+    name: Push GitHub Packages
+    needs: build
+    if: github.event_name == 'release' || github.ref == 'refs/heads/master'
+    environment:
+      name: GitHub Packages
+      url: https://github.com/${{ github.repository }}/packages
+    permissions:
+      packages: write
+    runs-on: windows-latest
+    steps:
+      - name: Download Artifact
+        uses: actions/download-artifact@v3.0.2
+        with:
+          name: "windows-latest"
+      - name: Dotnet NuGet Add Source
+        shell: pwsh
+        run: dotnet nuget add source https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json \
+          --name GitHub \
+          --username ${{ github.repository_owner }} \
+          --password ${{ secrets.GITHUB_TOKEN }}
+      - name: Dotnet NuGet Push
+        shell: pwsh
+        run: dotnet nuget push .\*.nupkg --api-key ${{ github.token }} --source GitHub --skip-duplicate
+
+  push-nuget:
+    name: Push NuGet Packages
+    needs: build
+    if: github.event_name == 'release'
+    environment:
+      name: NuGet
+      url: https://www.nuget.org/packages/atlas-ef
+    runs-on: windows-latest
+    steps:
+      - name: Download Artifact
+        uses: actions/download-artifact@v3.0.2
+        with:
+          name: "windows-latest"
+      - name: Dotnet NuGet Push
+        shell: pwsh
+        run: |
+          Get-ChildItem .\ -Filter *.nupkg |
+          Where-Object { !$_.Name.Contains('preview') } |
+          ForEach-Object {
+            dotnet nuget push $_ --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+          }
