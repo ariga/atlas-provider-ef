@@ -1,4 +1,4 @@
-# Atlas Provider for Entity Framework Core
+# Atlas Provider for EF Core
 
 [![AtlasEF NuGet Package](https://img.shields.io/nuget/v/atlas-ef.svg)](https://www.nuget.org/packages/atlas-ef/) 
 
