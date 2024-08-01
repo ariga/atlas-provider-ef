@@ -55,7 +55,8 @@ data "external_schema" "ef" {
   ]
 }
 
-env "ef" {
+env {
+  name = atlas.env
   src = data.external_schema.ef.url
   dev = "docker://mysql/8/dev" # list of dev dbs can be found here: https://atlasgo.io/concepts/dev-database
   migration {
