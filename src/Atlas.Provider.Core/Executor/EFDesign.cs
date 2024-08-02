@@ -40,7 +40,19 @@ internal class EFDesign : IDisposable
     string[]? remainingArguments
   )
   {
-    _commandsAssembly = Assembly.Load(new AssemblyName { Name = DesignAssemblyName });
+    try
+    {
+      _commandsAssembly = Assembly.Load(new AssemblyName { Name = DesignAssemblyName });
+    }
+    catch (FileNotFoundException ex)
+    when (ex.FileName != null &&
+      new AssemblyName(ex.FileName).Name == DesignAssemblyName)
+    {
+      throw new FileNotFoundException(
+        $"Could not find package {DesignAssemblyName}. " +
+        $"This package is required for the tool to work. Ensure your startup project is correct, install the package, and try again."
+      );
+    }
 
     var reportHandlerType = _commandsAssembly.GetType(ReportHandlerTypeName, throwOnError: true, ignoreCase: false)!;
     var reportHandler = Activator.CreateInstance(
