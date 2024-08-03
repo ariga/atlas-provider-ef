@@ -5,7 +5,7 @@ namespace Atlas.Provider.Core
 {
   static class Program
   {
-    static void Main(
+    static int Main(
       string assembly,
       string project,
       string startupAssembly,
@@ -58,10 +58,12 @@ namespace Atlas.Provider.Core
             Console.WriteLine(sql);
           }
         }
+        return 0;
       }
       catch (Exception ex)
       {
         Console.Error.WriteLine(ex.Message);
+        return 1;
       }
     }
   }

@@ -16,7 +16,7 @@ namespace Atlas.Provider.Loader
     /// If this option is omitted, EF Core will find the context class. If there are multiple context classes, this option is required.</param>
     /// <param name="noBuild">Don't build the project. Intended to be used when the build is up-to-date.</param>
     /// <param name="args"></param>
-    static void Main(
+    static int Main(
       string project,
       string startupProject,
       string framework,
@@ -92,7 +92,7 @@ namespace Atlas.Provider.Loader
           arguments.Add("--nullable");
         }
         // dotnet exec [runtime-options] [path-to-application] [arguments]
-        Exe.Run("dotnet", [
+        return Exe.Run("dotnet", [
             "exec",
                 .. runtimeOpts,
                 Path.Combine(loaderDirPath!, AssemblyName + ".dll"),
@@ -102,6 +102,7 @@ namespace Atlas.Provider.Loader
       catch (Exception ex)
       {
         Console.Error.WriteLine(ex.Message);
+        return 1;
       }
     }
   }
