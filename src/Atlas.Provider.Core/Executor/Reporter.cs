@@ -4,6 +4,7 @@ using System.Linq;
 
 namespace Atlas.Provider.Core.Executor;
 
+// The Reporter logs to stderr to separate error messages from SQL output, which goes to stdout.
 internal static class Reporter
 {
   public static bool IsVerbose { get; set; }
@@ -16,16 +17,16 @@ internal static class Reporter
       => Console.Error.WriteLine(Prefix("warn:    ", message));
 
   public static void WriteInformation(string? message)
-      => Console.WriteLine(Prefix("info:    ", message));
+      => Console.Error.WriteLine(Prefix("info:    ", message));
 
   public static void WriteData(string? message)
-      => Console.WriteLine(Prefix("data:    ", message));
+      => Console.Error.WriteLine(Prefix("data:    ", message));
 
   public static void WriteVerbose(string? message)
   {
     if (IsVerbose)
     {
-      Console.WriteLine(Prefix("verbose: ", message));
+      Console.Error.WriteLine(Prefix("verbose: ", message));
     }
   }
 
