@@ -41,7 +41,6 @@ Task("Test")
     DotNetTest(project.ToString(), new DotNetTestSettings()
     {
       Blame = true,
-      Collectors = new string[] { "Code Coverage", "XPlat Code Coverage" },
       Configuration = configuration,
       Loggers = new string[]
       {
