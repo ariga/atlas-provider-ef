@@ -77,6 +77,9 @@ jobs:
       - name: Dotnet Tool Restore
         shell: pwsh
         run: dotnet tool restore
+      - name: Dotnet restore
+        shell: pwsh
+        run: dotnet restore
       - name: Install AtlasEF
         shell: pwsh
         run: dotnet tool install --prerelease --add-source ./artifacts atlas-ef
