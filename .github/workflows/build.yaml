@@ -74,28 +74,30 @@ jobs:
           dotnet-version: |
             6.0.x
             8.0.x
-      - name: Dotnet Tool Restore
-        shell: pwsh
-        run: dotnet tool restore
       - name: Dotnet restore
         shell: pwsh
         run: dotnet restore
       - name: Install AtlasEF
         shell: pwsh
         run: dotnet tool install --prerelease --add-source ./artifacts atlas-ef
-      - name: Dotnet Cake Test
-        shell: pwsh
-        run: dotnet cake --target=Test
       - name: Print SQL from Demo project
         shell: pwsh
         working-directory: ./src/Atlas.Provider.Demo
         run: dotnet atlas-ef -- sqlserver
+      - name: Dotnet Tool Restore
+        shell: pwsh
+        run: dotnet tool restore
+      - name: Dotnet Cake Build
+        shell: pwsh
+        run: dotnet cake --target=Build
+      - name: Dotnet Cake Test
+        shell: pwsh
+        run: dotnet cake --target=Test
       - name: Upload test results
         uses: actions/upload-artifact@v4
         with:
           name: build-artifacts
           path: "./artifacts/**/*.xml"
-
 
   publish-test-results:
     name: Publish Tests Results
