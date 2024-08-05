@@ -133,7 +133,6 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: build-artifacts
-          path: "./artifacts"
       - name: Dotnet NuGet Add Source
         shell: pwsh
         run: |
@@ -156,7 +155,6 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: build-artifacts
-          path: "./artifacts"
       - name: Dotnet NuGet Push
         shell: pwsh
         run: |
