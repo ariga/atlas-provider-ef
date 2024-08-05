@@ -1,26 +1,25 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Version>0.0.1</Version>
-    <Authors>ariga</Authors>
-    <Description>Atlas Provider for EntityFramework</Description>
-
     <OutputType>Exe</OutputType>
     <OutputPath>..\..\artifacts\bin\$(MSBuildProjectName)\$(Configuration)\</OutputPath>
     <TargetFramework>net6.0</TargetFramework>
     <Configuration>$(Configuration)</Configuration>
-
     <RootNamespace>Atlas.Provider.Loader</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IncludeSource>false</IncludeSource>
     <LangVersion>latest</LangVersion>
     <RollForward>Major</RollForward>
-
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>atlas-ef</ToolCommandName>
+    
     <!-- Nuspec -->
     <PackageId>atlas-ef</PackageId>
-    <PackageProjectUrl>https://github.com/ariga/atlas-provider-ef</PackageProjectUrl>
+    <Authors>ariga</Authors>
+    <Description>Atlas Provider for EntityFramework Core</Description>
+    <PackageProjectUrl>https://atlasgo.io</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/ariga/atlas-provider-ef</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageOutputPath>..\..\artifacts</PackageOutputPath>
