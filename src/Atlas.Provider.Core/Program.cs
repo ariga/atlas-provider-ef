@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using Atlas.Provider.Core.Executor;
 
 namespace Atlas.Provider.Core
@@ -21,6 +22,9 @@ namespace Atlas.Provider.Core
     {
       try
       {
+        // prevent any output from being written to the console, including warn, info, error etc messages from EF Core
+        var originalOut = Console.Out;
+        Console.SetOut(TextWriter.Null);
         using var executor = new EFDesign(
           assembly,
           startupAssembly,
@@ -49,6 +53,7 @@ namespace Atlas.Provider.Core
             continue;
           }
           var sql = executor.ScriptDbContext(name);
+          Console.SetOut(originalOut);
           if (!string.IsNullOrEmpty(sql))
           {
             if (ctxInfo["ProviderName"]!.ToString()!.EndsWith("SqlServer"))
