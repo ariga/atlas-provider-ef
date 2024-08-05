@@ -57,10 +57,10 @@ internal class EFDesign : IDisposable
     var reportHandlerType = _commandsAssembly.GetType(ReportHandlerTypeName, throwOnError: true, ignoreCase: false)!;
     var reportHandler = Activator.CreateInstance(
       reportHandlerType,
-      (Action<string>)Reporter.WriteError,
-      (Action<string>)Reporter.WriteWarning,
-      (Action<string>)Reporter.WriteInformation,
-      (Action<string>)Reporter.WriteVerbose
+      (Action<string>)(_ => { }),
+      (Action<string>)(_ => { }),
+      (Action<string>)(_ => { }),
+      (Action<string>)(_ => { })
     )!;
 
     var assemblyFileName = Path.GetFileNameWithoutExtension(assembly);
