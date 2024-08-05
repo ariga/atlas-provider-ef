@@ -22,7 +22,7 @@ env:
 
 jobs:
   build:
-    name: Build (Windows)
+    name: Build on Windows
     runs-on: windows-latest
     steps:
       - name: Checkout
@@ -33,17 +33,19 @@ jobs:
       - name: Install .NET Core SDK
         uses: actions/setup-dotnet@v3.2.0
         with:
-          dotnet-version: |
-            2.1
+          dotnet-version: '8.0.x'
+      - name: List SDKs
+        shell: pwsh
+        run: dotnet --list-sdks
       - name: Dotnet Tool Restore
         shell: pwsh
         run: dotnet tool restore
-      - name: Dotnet Cake Build
+      - name: Dotnet restore
         shell: pwsh
-        run: dotnet cake --target=Build
-      - name: Dotnet Cake Pack
+        run: dotnet restore
+      - name: Dotnet Cake CI
         shell: pwsh
-        run: dotnet cake --target=Pack
+        run: dotnet cake --target=CI
       - name: Publish artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -63,20 +65,23 @@ jobs:
         with:
           lfs: true
           fetch-depth: 0
-      - name: Download build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: build-artifacts
-          path: "./artifacts"
       - name: Install .NET Core SDK
         uses: actions/setup-dotnet@v3.2.0
         with:
           dotnet-version: |
             6.0.x
             8.0.x
+      - name: Dotnet Tool Restore
+        shell: pwsh
+        run: dotnet tool restore
       - name: Dotnet restore
         shell: pwsh
         run: dotnet restore
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifacts
+          path: "./artifacts"
       - name: Install AtlasEF
         shell: pwsh
         run: dotnet tool install --prerelease --add-source ./artifacts atlas-ef
@@ -84,12 +89,6 @@ jobs:
         shell: pwsh
         working-directory: ./src/Atlas.Provider.Demo
         run: dotnet atlas-ef -- sqlserver
-      - name: Dotnet Tool Restore
-        shell: pwsh
-        run: dotnet tool restore
-      - name: Dotnet Cake Build
-        shell: pwsh
-        run: dotnet cake --target=Build
       - name: Dotnet Cake Test
         shell: pwsh
         run: dotnet cake --target=Test

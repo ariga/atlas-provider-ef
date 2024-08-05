@@ -48,8 +48,6 @@ Task("Test")
         $"html;LogFileName={project.GetFilenameWithoutExtension()}.html",
         $"junit;LogFileName={project.GetFilenameWithoutExtension()}.xml",
       },
-      NoBuild = true,
-      NoRestore = true,
       ResultsDirectory = artifactsDirectory,
     });
   });
@@ -72,10 +70,14 @@ Task("Pack")
     });
   });
 
+Task("CI")
+  .Description("Runs the default target in CI mode.")
+  .IsDependentOn("Build")
+  .IsDependentOn("Pack");
+
 Task("Default")
   .Description("Cleans, restores NuGet packages, builds the solution, runs unit tests and then creates NuGet packages.")
-  .IsDependentOn("Build")
-  .IsDependentOn("Test")
-  .IsDependentOn("Pack");
+  .IsDependentOn("CI")
+  .IsDependentOn("Test");
 
 RunTarget(target);

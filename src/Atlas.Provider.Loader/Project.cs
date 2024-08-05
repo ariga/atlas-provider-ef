@@ -48,8 +48,8 @@ internal class Project
     buildExtensionsDir ??= Path.Combine(Path.GetDirectoryName(file)!, "obj");
     Directory.CreateDirectory(buildExtensionsDir);
     var targetsPath = Path.Combine(buildExtensionsDir, Path.GetFileName(file) + ".atlas-ef.targets");
-    using (var input = typeof(Project).Assembly.GetManifestResourceStream("Atlas.Provider.Loader.Resources.AtlasEF.targets")!)
-    {
+    if (!File.Exists(targetsPath)) {
+      using var input = typeof(Project).Assembly.GetManifestResourceStream("Atlas.Provider.Loader.Resources.AtlasEF.targets") ?? throw new InvalidOperationException("Resource not found");
       using var output = File.OpenWrite(targetsPath);
       input.CopyTo(output);
     }
