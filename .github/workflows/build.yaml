@@ -34,6 +34,9 @@ jobs:
         uses: actions/setup-dotnet@v3.2.0
         with:
           dotnet-version: '2.1'
+      - name: List SDKs
+        shell: pwsh
+        run: dotnet --list-sdks
       - name: Dotnet Tool Restore
         shell: pwsh
         run: dotnet tool restore
