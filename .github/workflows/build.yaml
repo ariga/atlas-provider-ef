@@ -33,7 +33,7 @@ jobs:
       - name: Install .NET Core SDK
         uses: actions/setup-dotnet@v3.2.0
         with:
-          dotnet-version: '2.1'
+          dotnet-version: '8.0.x'
       - name: List SDKs
         shell: pwsh
         run: dotnet --list-sdks
