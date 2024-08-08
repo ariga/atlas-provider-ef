@@ -6,23 +6,34 @@ namespace Atlas.Provider.Core
 {
   static class Program
   {
-    static int Main(string[] args)
+    static int Main(
+      string assembly,
+      string project,
+      string startupAssembly,
+      string startupProject,
+      string projectDir,
+      string rootNamespace,
+      string language,
+      string framework,
+      string workingDir,
+      bool nullable = true,
+      string[]? args = null
+    )
     {
       try
       {
-        var options = new Options(args);
         // prevent any output from being written to the console, including warn, info, error etc messages from EF Core
         var originalOut = Console.Out;
         Console.SetOut(Console.Error);
         using var executor = new EFDesign(
-          options.Assembly,
-          options.StartupAssembly,
-          options.ProjectDir,
+          assembly,
+          startupAssembly,
+          projectDir,
           null,
-          options.RootNamespace,
-          options.Language,
-          options.Nullable,
-          options.PositionalArgs?.ToArray()
+          rootNamespace,
+          language,
+          nullable,
+          args
         );
         var types = executor.GetContextTypes();
         foreach (var type in types)

@@ -15,4 +15,7 @@
     <IsPackable>false</IsPackable>
     <CheckEolTargetFramework>False</CheckEolTargetFramework>
   </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="System.CommandLine.DragonFruit" Version="0.4.0-alpha.22272.1" />
+  </ItemGroup>
 </Project>
