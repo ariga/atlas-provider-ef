@@ -97,7 +97,6 @@ internal class EFDesign : IDisposable
       Directory.GetCurrentDirectory(),
       Path.GetDirectoryName(startupAssembly ?? assembly)!
     ));
-
     AppDomain.CurrentDomain.AssemblyResolve += ResolveAssembly;
   }
 
