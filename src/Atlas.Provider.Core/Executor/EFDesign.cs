@@ -30,7 +30,7 @@ internal class EFDesign : IDisposable
   private readonly string _appBasePath;
 
   public EFDesign(
-    string assembly,
+    string? assembly,
     string? startupAssembly,
     string? projectDir,
     string? dataDirectory,
@@ -97,6 +97,7 @@ internal class EFDesign : IDisposable
       Directory.GetCurrentDirectory(),
       Path.GetDirectoryName(startupAssembly ?? assembly)!
     ));
+
     AppDomain.CurrentDomain.AssemblyResolve += ResolveAssembly;
   }
 

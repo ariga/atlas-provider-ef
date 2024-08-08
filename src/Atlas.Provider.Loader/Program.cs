@@ -6,25 +6,68 @@ namespace Atlas.Provider.Loader
   {
     private const string AssemblyName = "Atlas.Provider.Core";
 
-    /// <summary>
-    /// This class used to load the current context into Core Commands
-    /// </summary>
-    /// <param name="project">Relative path to the project folder of the target project. Default value is the current folder.</param>
-    /// <param name="startupProject">Relative path to the project folder of the startup project. Default value is the current folder.</param>
-    /// <param name="framework">The Target Framework Moniker for the target framework. Use when the project file specifies multiple target frameworks, and you want to select one of them.</param>
-    /// <param name="context">The DbContext class to use. Class name only or fully qualified with namespaces. 
-    /// If this option is omitted, EF Core will find the context class. If there are multiple context classes, this option is required.</param>
-    /// <param name="noBuild">Don't build the project. Intended to be used when the build is up-to-date.</param>
-    /// <param name="args"></param>
-    static int Main(
-      string project,
-      string startupProject,
-      string framework,
-      string context,
-      bool noBuild = false,
-      string[]? args = null
-    )
+    static int Main(string[] args)
     {
+      string? project = null;
+      string? startupProject = null;
+      string? framework = null;
+      string? context = null;
+      bool noBuild = false;
+      var positionalArgs = new List<string>();
+
+      for (int i = 0; i < args.Length; i++)
+      {
+        switch (args[i])
+        {
+          case "--project":
+            if (i + 1 < args.Length)
+            {
+              project = args[++i];
+            }
+            else
+            {
+              Console.WriteLine("Error: --project option requires a value.");
+            }
+            break;
+          case "--startup-project":
+            if (i + 1 < args.Length)
+            {
+              startupProject = args[++i];
+            }
+            else
+            {
+              Console.WriteLine("Error: --startup-project option requires a value.");
+            }
+            break;
+          case "--framework":
+            if (i + 1 < args.Length)
+            {
+              framework = args[++i];
+            }
+            else
+            {
+              Console.WriteLine("Error: --framework option requires a value.");
+            }
+            break;
+          case "--context":
+            if (i + 1 < args.Length)
+            {
+              context = args[++i];
+            }
+            else
+            {
+              Console.WriteLine("Error: --context option requires a value.");
+            }
+            break;
+          case "--no-build":
+            noBuild = true;
+            break;
+          default:
+          positionalArgs.Add(args[i]);
+            break;
+        }
+      }
+
       try
       {
         var (projectFile, startupProjectFile) = Project.ResolveProjects(project, startupProject);
