@@ -13,7 +13,7 @@ namespace Atlas.Provider.Core
         var options = new Options(args);
         // prevent any output from being written to the console, including warn, info, error etc messages from EF Core
         var originalOut = Console.Out;
-        Console.SetOut(TextWriter.Null);
+        Console.SetOut(Console.Error);
         using var executor = new EFDesign(
           options.Assembly,
           options.StartupAssembly,
