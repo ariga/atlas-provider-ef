@@ -52,6 +52,38 @@ jobs:
           name: build-artifacts
           path: "./artifacts"
 
+  test-tool:
+    name: Test Tool (${{ matrix.os }})
+    needs: build
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.0.0
+        with:
+          lfs: true
+          fetch-depth: 0
+      - name: Install .NET Core SDK
+        uses: actions/setup-dotnet@v3.2.0
+        with:
+          dotnet-version: |
+            6.0.x
+            8.0.x
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifacts
+          path: "./artifacts"
+      - name: Install AtlasEF
+        shell: pwsh
+        run: dotnet tool install --prerelease --add-source ./artifacts atlas-ef
+      - name: Print SQL from Demo project
+        shell: pwsh
+        working-directory: ./src/Atlas.Provider.Demo
+        run: dotnet atlas-ef -- sqlserver
+
   test:
     name: Test (${{ matrix.os }})
     needs: build
@@ -77,18 +109,6 @@ jobs:
       - name: Dotnet restore
         shell: pwsh
         run: dotnet restore
-      - name: Download build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: build-artifacts
-          path: "./artifacts"
-      - name: Install AtlasEF
-        shell: pwsh
-        run: dotnet tool install --prerelease --add-source ./artifacts atlas-ef
-      - name: Print SQL from Demo project
-        shell: pwsh
-        working-directory: ./src/Atlas.Provider.Demo
-        run: dotnet atlas-ef -- sqlserver
       - name: Dotnet Cake Test
         shell: pwsh
         run: dotnet cake --target=Test
