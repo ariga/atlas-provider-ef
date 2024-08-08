@@ -17,7 +17,7 @@ public class GenerateSchemaTest
     {
       WorkingDirectory = Path.GetFullPath("../../../../../src/Atlas.Provider.Demo"),
       FileName = "dotnet",
-      Arguments = $"exec {dllFileName} {providerName}",
+      Arguments = $"exec {dllFileName} -- {providerName}",
       RedirectStandardOutput = true,
       RedirectStandardError = true,
       UseShellExecute = false,

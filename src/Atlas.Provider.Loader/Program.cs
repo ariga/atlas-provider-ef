@@ -13,58 +13,68 @@ namespace Atlas.Provider.Loader
       string? framework = null;
       string? context = null;
       bool noBuild = false;
-      var positionalArgs = new List<string>();
+      var extraArgs = new List<string>();
+      bool parsingExtraArgs = false;
 
       for (int i = 0; i < args.Length; i++)
       {
-        switch (args[i])
+        if (args[i] == "--")
         {
-          case "--project":
-            if (i + 1 < args.Length)
-            {
-              project = args[++i];
-            }
-            else
-            {
-              Console.WriteLine("Error: --project option requires a value.");
-            }
-            break;
-          case "--startup-project":
-            if (i + 1 < args.Length)
-            {
-              startupProject = args[++i];
-            }
-            else
-            {
-              Console.WriteLine("Error: --startup-project option requires a value.");
-            }
-            break;
-          case "--framework":
-            if (i + 1 < args.Length)
-            {
-              framework = args[++i];
-            }
-            else
-            {
-              Console.WriteLine("Error: --framework option requires a value.");
-            }
-            break;
-          case "--context":
-            if (i + 1 < args.Length)
-            {
-              context = args[++i];
-            }
-            else
-            {
-              Console.WriteLine("Error: --context option requires a value.");
-            }
-            break;
-          case "--no-build":
-            noBuild = true;
-            break;
-          default:
-          positionalArgs.Add(args[i]);
-            break;
+          parsingExtraArgs = true;
+          continue;
+        }
+        if (parsingExtraArgs)
+        {
+          extraArgs.Add(args[i]);
+        }
+        else
+        {
+          switch (args[i])
+          {
+            case "--project":
+              if (i + 1 < args.Length)
+              {
+                project = args[++i];
+              }
+              else
+              {
+                Console.WriteLine("Error: --project option requires a value.");
+              }
+              break;
+            case "--startup-project":
+              if (i + 1 < args.Length)
+              {
+                startupProject = args[++i];
+              }
+              else
+              {
+                Console.WriteLine("Error: --startup-project option requires a value.");
+              }
+              break;
+            case "--framework":
+              if (i + 1 < args.Length)
+              {
+                framework = args[++i];
+              }
+              else
+              {
+                Console.WriteLine("Error: --framework option requires a value.");
+              }
+              break;
+            case "--context":
+              if (i + 1 < args.Length)
+              {
+                context = args[++i];
+              }
+              else
+              {
+                Console.WriteLine("Error: --context option requires a value.");
+              }
+              break;
+            case "--no-build":
+              noBuild = true;
+              break;
+          }
         }
       }
 
@@ -114,9 +124,9 @@ namespace Atlas.Provider.Loader
         }
 
         var arguments = new List<string>();
-        if (args != null)
+        if (extraArgs != null)
         {
-          arguments.AddRange(args);
+          arguments.AddRange(extraArgs);
         }
         arguments.AddRange([
             "--root-namespace", _project.RootNamespace!,
