@@ -19,7 +19,6 @@ namespace Atlas.Provider.Core
 
     public Options(string[] args)
     {
-      Assembly = string.Empty;
       for (int i = 0; i < args.Length; i++)
       {
         switch (args[i])

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using Atlas.Provider.Core.Executor;
-using System.Collections.Generic;
 
 namespace Atlas.Provider.Core
 {
