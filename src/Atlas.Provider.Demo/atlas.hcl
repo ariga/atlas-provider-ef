@@ -19,7 +19,8 @@ data "external_schema" "ef" {
   ]
 }
 
-env "ef" {
+env {
+  name = atlas.env
   src = data.external_schema.ef.url
   dev = local.dev_url
   migration {
