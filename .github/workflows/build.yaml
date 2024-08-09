@@ -58,6 +58,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
+        dialect: [mysql, postgres, sqlserver, sqlite]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout
@@ -83,6 +84,22 @@ jobs:
         shell: pwsh
         working-directory: ./src/Atlas.Provider.Demo
         run: dotnet atlas-ef -- sqlserver
+      - name: Check migrations for ${{ matrix.dialect }}
+        shell: pwsh
+        working-directory: ./src/Atlas.Provider.Demo
+        run: |
+          atlas migrate diff --env ef --var dialect=${{ matrix.dialect }}
+        env:
+          ATLAS_TOKEN: ${{ secrets.ATLAS_TOKEN }}
+      - name: Verify migrations generated
+        run: |
+          status=$(git status --porcelain)
+          if [ -n "$status" ]; then
+            echo "you need to run 'atlas migrate diff --env ef' and commit the changes"
+            echo "$status"
+            git --no-pager diff
+            exit 1
+          fi
 
   test:
     name: Test (${{ matrix.os }})
