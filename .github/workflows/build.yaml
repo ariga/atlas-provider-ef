@@ -105,11 +105,10 @@ jobs:
         env:
           ATLAS_TOKEN: ${{ secrets.ATLAS_TOKEN }}
       - name: Verify migrations generated
+        shell: bash
         run: |
-          status=$(git status --porcelain | grep -v 'config/dotnet-tools.json')
-          if [ -n "$status" ]; then
+          if git status --porcelain | grep -vq 'dotnet-tools.json' ; then
             echo "you need to run 'atlas migrate diff --env ef' and commit the changes"
-            echo "$status"
             git --no-pager diff
             exit 1
           fi
