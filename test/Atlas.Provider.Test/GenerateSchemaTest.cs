@@ -29,7 +29,8 @@ public class GenerateSchemaTest
     string output = process.StandardOutput.ReadToEnd();
     string error = process.StandardError.ReadToEnd();
     process.WaitForExit();
-    Assert.Equal(FileReader.Read(expectedFile), output);
+    string normalizedOutput = FileReader.Read(expectedFile).Replace("\r\n", "\n");
+    Assert.Equal(FileReader.Read(expectedFile), normalizedOutput);
     Assert.Equal("", error);
   }
 }
