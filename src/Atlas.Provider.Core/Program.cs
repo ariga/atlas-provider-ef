@@ -11,7 +11,7 @@ namespace Atlas.Provider.Core
       try
       {
         var options = new Options(args);
-        // prevent any output from being written to the console, including warn, info, error etc messages from EF Core
+        // prevent any output from being written to the stdout, including warn, info, error etc messages from EF Core
         var originalOut = Console.Out;
         Console.SetOut(Console.Error);
         using var executor = new EFDesign(
@@ -45,6 +45,7 @@ namespace Atlas.Provider.Core
           Console.SetOut(originalOut);
           if (!string.IsNullOrEmpty(sql))
           {
+            Console.Out.NewLine = "\n";
             if (ctxInfo["ProviderName"]!.ToString()!.EndsWith("SqlServer"))
             {
               Console.WriteLine("-- atlas:delimiter GO");
