@@ -29,7 +29,10 @@ public class GenerateSchemaTest
     string output = process.StandardOutput.ReadToEnd();
     string error = process.StandardError.ReadToEnd();
     process.WaitForExit();
-    Assert.Equal(FileReader.Read(expectedFile), output);
+    string expected = FileReader.Read(expectedFile);
+    // expectedFile is LF, defined in .gitattributes
+    // output is platform-specific, so normalize to LF
+    Assert.Equal(FileReader.Read(expectedFile), output.ReplaceLineEndings("\n"));
     Assert.Equal("", error);
   }
 }

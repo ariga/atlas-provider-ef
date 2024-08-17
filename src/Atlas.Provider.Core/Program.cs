@@ -45,7 +45,6 @@ namespace Atlas.Provider.Core
           Console.SetOut(originalOut);
           if (!string.IsNullOrEmpty(sql))
           {
-            Console.Out.NewLine = "\n";
             if (ctxInfo["ProviderName"]!.ToString()!.EndsWith("SqlServer"))
             {
               Console.WriteLine("-- atlas:delimiter GO");
