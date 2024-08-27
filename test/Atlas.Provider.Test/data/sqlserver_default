@@ -9,6 +9,11 @@ CREATE TABLE [Blogs] (
     CONSTRAINT [PK_Blogs] PRIMARY KEY ([BlogId]),
     CONSTRAINT [AK_Blogs_Url] UNIQUE ([Url])
 );
+DECLARE @defaultSchema AS sysname;
+SET @defaultSchema = SCHEMA_NAME();
+DECLARE @description AS sql_variant;
+SET @description = CONCAT(N'Content contains new lines \n\r and ', NCHAR(10), N' for example');
+EXEC sp_addextendedproperty 'MS_Description', @description, 'SCHEMA', @defaultSchema, 'TABLE', N'Blogs', 'COLUMN', N'Content';
 GO
 
 

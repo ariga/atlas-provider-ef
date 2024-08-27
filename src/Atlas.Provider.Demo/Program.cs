@@ -42,7 +42,11 @@ namespace DemoNamespace
                     options.UseSqlite("Data Source=localdatabase.db;");
                     break;
                 case "mysql":
-                    options.UseMySql("Server=localhost;Database=YourDatabaseName;User=root;Password=your_password;", ServerVersion.Create(8, 0, 0, ServerType.MySql));
+                    options.UseMySql(
+                        "Server=localhost;Database=YourDatabaseName;User=root;Password=your_password;",
+                        ServerVersion.Create(8, 0, 0, ServerType.MySql),
+                        optionsBuilder => optionsBuilder.DisableLineBreakToCharSubstition()
+                        );
                     break;
                 case "mariadb":
                     options.UseMySql("Server=localhost;Database=YourDatabaseName;User=root;Password=your_password;", ServerVersion.Create(8, 7, 0, ServerType.MariaDb));

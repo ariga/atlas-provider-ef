@@ -8,6 +8,8 @@ CREATE TABLE "Blogs" (
     CONSTRAINT "PK_Blogs" PRIMARY KEY ("BlogId"),
     CONSTRAINT "AK_Blogs_Url" UNIQUE ("Url")
 );
+COMMENT ON COLUMN "Blogs"."Content" IS 'Content contains new lines \n\r and 
+ for example';
 
 
 CREATE TABLE "Post" (
