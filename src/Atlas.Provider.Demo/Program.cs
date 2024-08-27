@@ -42,7 +42,11 @@ namespace DemoNamespace
                     options.UseSqlite("Data Source=localdatabase.db;");
                     break;
                 case "mysql":
-                    options.UseMySql("Server=localhost;Database=YourDatabaseName;User=root;Password=your_password;", ServerVersion.Create(8, 0, 0, ServerType.MySql));
+                    options.UseMySql(
+                        "Server=localhost;Database=YourDatabaseName;User=root;Password=your_password;",
+                        ServerVersion.Create(8, 0, 0, ServerType.MySql),
+                        optionsBuilder => optionsBuilder.DisableLineBreakToCharSubstition()
+                        );
                     break;
                 case "mariadb":
                     options.UseMySql("Server=localhost;Database=YourDatabaseName;User=root;Password=your_password;", ServerVersion.Create(8, 7, 0, ServerType.MariaDb));
@@ -84,6 +88,7 @@ namespace DemoNamespace
         [Column(TypeName = "decimal(5, 2)")]
         public decimal Rating { get; set; }
         public string Title { get; set; } = string.Empty;
+        [Comment("Content contains new lines \\n\\r and \n for example")]
         public string Content { get; set; } = string.Empty;
         public string Author { get; set; } = string.Empty;
         public List<Post>? Posts { get; set; }

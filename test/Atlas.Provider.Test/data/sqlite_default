@@ -1,9 +1,16 @@
 CREATE TABLE "Blogs" (
     "BlogId" INTEGER NOT NULL CONSTRAINT "PK_Blogs" PRIMARY KEY AUTOINCREMENT,
+
     "Url" varchar(200) NOT NULL,
+
     "Rating" decimal(5, 2) NOT NULL,
+
     "Title" TEXT NOT NULL,
+
+    -- Content contains new lines \n\r and 
+    --  for example
     "Content" TEXT NOT NULL,
+
     "Author" TEXT NOT NULL DEFAULT 'Anonymous',
     CONSTRAINT "AK_Blogs_Url" UNIQUE ("Url")
 );

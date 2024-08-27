@@ -6,7 +6,8 @@ CREATE TABLE `Blogs` (
     `Url` varchar(200) CHARACTER SET utf8mb4 NOT NULL,
     `Rating` decimal(5,2) NOT NULL,
     `Title` longtext CHARACTER SET utf8mb4 NOT NULL,
-    `Content` longtext CHARACTER SET utf8mb4 NOT NULL,
+    `Content` longtext CHARACTER SET utf8mb4 NOT NULL COMMENT 'Content contains new lines \\n\\r and 
+ for example',
     `Author` varchar(200) CHARACTER SET utf8mb4 NOT NULL DEFAULT 'Anonymous',
     CONSTRAINT `PK_Blogs` PRIMARY KEY (`BlogId`),
     CONSTRAINT `AK_Blogs_Url` UNIQUE (`Url`)
