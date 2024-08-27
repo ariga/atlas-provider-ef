@@ -43,13 +43,14 @@ namespace Atlas.Provider.Core
           }
           var sql = executor.ScriptDbContext(name);
           Console.SetOut(originalOut);
+          Console.Out.NewLine = "\n";
           if (!string.IsNullOrEmpty(sql))
           {
             if (ctxInfo["ProviderName"]!.ToString()!.EndsWith("SqlServer"))
             {
               Console.WriteLine("-- atlas:delimiter GO");
             }
-            Console.WriteLine(sql);
+            Console.WriteLine(sql.Replace(Environment.NewLine, "\n"));
           }
         }
         return 0;
