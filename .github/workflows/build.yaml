@@ -83,7 +83,7 @@ jobs:
       - name: Print SQL from Demo project
         shell: pwsh
         working-directory: ./src/Atlas.Provider.Demo
-        run: dotnet atlas-ef -- sqlserver
+        run: dotnet tool restore && dotnet atlas-ef -- sqlserver
       - name: Install Atlas CLI (Windows)
         shell: bash
         if: startsWith(runner.os, 'Windows')
