@@ -57,8 +57,8 @@ jobs:
     needs: build
     strategy:
       matrix:
-        os: [windows-latest, macos-latest]
-        dialect: [sqlite]
+        os: [windows-latest]
+        dialect: [postgres, sqlite]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout
