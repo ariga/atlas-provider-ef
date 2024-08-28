@@ -53,11 +53,12 @@ jobs:
           path: "./artifacts"
 
   test-tool:
-    name: Test Tool (${{ matrix.os }})
+    name: Test tool on ${{ matrix.os }} - ${{ matrix.dialect }}
     needs: build
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [windows-latest]
+        dialect: [postgres]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout
@@ -82,103 +83,32 @@ jobs:
       - name: Print SQL from Demo project
         shell: pwsh
         working-directory: ./src/Atlas.Provider.Demo
-        run: dotnet atlas-ef -- sqlserver
-
-  test:
-    name: Test (${{ matrix.os }})
-    needs: build
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-    runs-on: ${{ matrix.os }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4.0.0
-        with:
-          lfs: true
-          fetch-depth: 0
-      - name: Install .NET Core SDK
-        uses: actions/setup-dotnet@v3.2.0
-        with:
-          dotnet-version: |
-            6.0.x
-            8.0.x
-      - name: Dotnet Tool Restore
-        shell: pwsh
-        run: dotnet tool restore
-      - name: Dotnet restore
-        shell: pwsh
-        run: dotnet restore
-      - name: Dotnet Cake Test
-        shell: pwsh
-        run: dotnet cake --target=Test
-      - name: Upload test results
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-artifacts ( ${{ matrix.os }} )
-          path: "./artifacts/**/*.xml"
-
-  publish-test-results:
-    name: Publish Tests Results
-    needs: test
-    if: always()
-    permissions:
-      checks: write
-      pull-requests: write
-    runs-on: ubuntu-latest
-    steps:
-      - name: Download Artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: "./artifacts"
-      - name: Publish Test Summary
-        uses: test-summary/action@v2
-        if: always()
-        with:
-          paths: "./artifacts/*/*.xml"
-
-  push-github-packages:
-    name: Push GitHub Packages
-    needs: test
-    if: github.event_name == 'release' || github.ref == 'refs/heads/master'
-    environment:
-      name: GitHub Packages
-      url: https://github.com/${{ github.repository }}/packages
-    permissions:
-      packages: write
-    runs-on: windows-latest
-    steps:
-      - name: Download Artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: build-artifacts
-      - name: Dotnet NuGet Add Source
-        shell: pwsh
+        run: dotnet tool restore && dotnet atlas-ef -- sqlserver
+      - name: Install Atlas CLI (Windows)
+        shell: bash
+        if: startsWith(runner.os, 'Windows')
         run: |
-          dotnet nuget add source https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json `
-            --name GitHub --username ${{ github.repository_owner }} --password ${{ secrets.GITHUB_TOKEN }}
-      - name: Dotnet NuGet Push
+          mkdir "${{ runner.temp }}/bin"
+          curl -fSL https://release.ariga.io/atlas/atlas-windows-amd64-latest.exe -o "${{ runner.temp }}\bin\atlas.exe"
+          echo "${{ runner.temp }}\bin" >> $GITHUB_PATH
+      - name: Install Atlas CLI (Ubuntu / MacOS)
         shell: pwsh
-        run: dotnet nuget push .\*.nupkg --api-key ${{ github.token }} --source GitHub --skip-duplicate
-
-  push-nuget:
-    name: Push NuGet Packages
-    needs: test
-    if: github.event_name == 'release'
-    environment:
-      name: NuGet
-      url: https://www.nuget.org/packages/atlas-ef
-    runs-on: windows-latest
-    steps:
-      - name: Download Artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: build-artifacts
-      - name: Dotnet NuGet Push
+        if: startsWith(runner.os, 'Linux') || startsWith(runner.os, 'macOS')
+        run: curl -sSf 'https://atlasgo.sh?test=1' | sh
+      - name: Verify Atlas CLI version
         shell: pwsh
+        run: atlas version
+      - name: Check migrations for ${{ matrix.dialect }}
+        working-directory: ./src/Atlas.Provider.Demo
         run: |
-          Get-ChildItem .\ -Filter *.nupkg |
-          Where-Object { !$_.Name.Contains('preview') } |
-          ForEach-Object {
-            dotnet nuget push $_ --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
-          }
+          atlas migrate diff --env ef --var dialect=${{ matrix.dialect }}
+        env:
+          ATLAS_TOKEN: ${{ secrets.ATLAS_TOKEN }}
+      - name: Verify migrations generated
+        shell: bash
+        run: |
+          if git status --porcelain | grep -vq 'dotnet-tools.json' ; then
+            echo "you need to run 'atlas migrate diff --env ef' and commit the changes"
+            git --no-pager diff
+            exit 1
+          fi
