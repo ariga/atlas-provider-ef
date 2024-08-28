@@ -1,3 +1,4 @@
 * text=auto
 
 test/**/data/* text eol=lf
+src/**/migrations/* text eol=lf
