@@ -19,7 +19,8 @@ Use PowerShell  to download the file:
 Invoke-WebRequest https://release.ariga.io/atlas/atlas-windows-amd64-latest.exe -OutFile atlas.exe
 ```
 
-Then move the Atlas binary to a file location on your system PATH.
+Then move the atlas binary to a directory that is included in your system PATH. If you prefer a different 
+directory, you can add it to your system PATH by editing the environment variables.
 
 **macOS + Linux:**
 
@@ -93,8 +94,6 @@ your current EF schema. This works by inspecting the target database schema and 
 EF schema, creating a migration plan. Atlas will prompt you to confirm the migration plan
 before applying it to the database.
 
-> Note: For Windows users, you need to use the `atlas.exe` command instead of `atlas`.
-
 ```bash
 atlas schema apply --env ef -u "mysql://root:password@localhost:3306/mydb"
 ```
@@ -108,8 +107,6 @@ Atlas supports a [versioned migration](https://atlasgo.io/concepts/declarative-v
 workflow, where each change to the database is versioned and recorded in a migration file. You can use the
 `atlas migrate diff` command to automatically generate a migration file that will migrate the database
 from its latest revision to the current EF schema.
-
-> Note: For Windows users, you need to use the `atlas.exe` command instead of `atlas`.
 
 ```bash
 atlas migrate diff --env ef 
