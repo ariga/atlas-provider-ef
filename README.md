@@ -123,6 +123,10 @@ The provider supports the following databases:
 * PostgreSQL
 * SQLite
 
+### Docs
+
+To learn more about the EF Core integration, check out the [documentation](https://atlasgo.io/guides/orms/efcore).
+
 ### License
 
 This project is licensed under the [Apache License 2.0](LICENSE).
