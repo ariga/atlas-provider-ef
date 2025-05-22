@@ -57,7 +57,7 @@ jobs:
     needs: build
     strategy:
       matrix:
-        os: [windows-latest]
+        os: [windows-2025]
         dialect: [postgres]
     runs-on: ${{ matrix.os }}
     steps:
