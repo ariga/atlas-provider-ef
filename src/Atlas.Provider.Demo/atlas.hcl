@@ -11,7 +11,7 @@ locals {
   }[var.dialect]
 }
 
-data "external_schema" "ef" {
+data "external_schema" "efcore" {
   program = [
     "dotnet",
     "atlas-ef",
@@ -21,7 +21,7 @@ data "external_schema" "ef" {
 
 env {
   name = atlas.env
-  src = data.external_schema.ef.url
+  src = data.external_schema.efcore.url
   dev = local.dev_url
   migration {
     dir = "file://migrations/${var.dialect}"
