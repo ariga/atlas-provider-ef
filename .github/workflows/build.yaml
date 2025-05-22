@@ -58,7 +58,7 @@ jobs:
     strategy:
       matrix:
         os: [windows-latest]
-        dialect: [sqlserver]
+        dialect: [mysql]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout
