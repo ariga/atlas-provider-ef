@@ -1,30 +1,18 @@
-variable "dialect" {
-  type = string
-}
-
-locals {
-  dev_url = {
-    mysql = "docker://mysql/8/dev"
-    postgres = "docker://postgres/15"
-    sqlserver = "docker://sqlserver/2022-latest"
-    sqlite = "sqlite://file::memory:?cache=shared"
-  }[var.dialect]
-}
 
 data "external_schema" "efcore" {
   program = [
     "dotnet",
     "atlas-ef",
-    "--", var.dialect,
+    "--", "mysql",
   ]
 }
 
 env {
   name = atlas.env
   src = data.external_schema.efcore.url
-  dev = local.dev_url
+  dev = "docker://mysql/8/dev"
   migration {
-    dir = "file://migrations/${var.dialect}"
+    dir = "file://migrations/mysql"
   }
   format {
     migrate {

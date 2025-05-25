@@ -92,7 +92,7 @@ jobs:
       - name: Check migrations for ${{ matrix.dialect }}
         working-directory: ./src/Atlas.Provider.Demo
         run: |
-          atlas migrate diff --env ef --var dialect=${{ matrix.dialect }}
+          atlas migrate diff --env efcore
         env:
           ATLAS_TOKEN: ${{ secrets.ATLAS_TOKEN }}
       - name: Verify migrations generated
