@@ -84,17 +84,8 @@ jobs:
         shell: pwsh
         working-directory: ./src/Atlas.Provider.Demo
         run: dotnet tool restore && dotnet atlas-ef -- sqlserver
-      - name: Install Atlas CLI (Windows)
-        shell: bash
-        if: startsWith(runner.os, 'Windows')
-        run: |
-          mkdir "${{ runner.temp }}/bin"
-          curl -fSL https://release.ariga.io/atlas/atlas-windows-amd64-latest.exe -o "${{ runner.temp }}\bin\atlas.exe"
-          echo "${{ runner.temp }}\bin" >> $GITHUB_PATH
-      - name: Install Atlas CLI (Ubuntu / MacOS)
-        shell: pwsh
-        if: startsWith(runner.os, 'Linux') || startsWith(runner.os, 'macOS')
-        run: curl -sSf 'https://atlasgo.sh?test=1' | sh
+      - name: Install Atlas CLI
+        uses: ariga/setup-atlas@v0
       - name: Verify Atlas CLI version
         shell: pwsh
         run: atlas version
