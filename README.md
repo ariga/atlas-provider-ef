@@ -3,7 +3,7 @@
 [![AtlasEF NuGet Package](https://img.shields.io/nuget/v/atlas-ef.svg)](https://www.nuget.org/packages/atlas-ef/) 
 
 Use [Atlas](https://atlasgo.io/) with [Entity Framework Core](https://learn.microsoft.com/en-us/ef/) to manage your database schema as code. By connecting your EF Core 
-models to Atlas, you can define and edit your schema directly in .NET. Atlas will then automatically plan and apply database schema migrations for you, 
+models to Atlas, you can define and edit your schema directly in C#. Atlas will then automatically plan and apply database schema migrations for you, 
 eliminating the need to write migrations manually.
 
 Atlas brings automated CI/CD workflows to your database, along with built-in support for [testing](https://atlasgo.io/testing/schema), [linting](https://atlasgo.io/versioned/lint),
