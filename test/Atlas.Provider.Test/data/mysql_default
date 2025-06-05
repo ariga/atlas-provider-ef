@@ -1,4 +1,13 @@
+-- atlas:pos AuditEntry[type=table] Program.cs:87:90
+-- atlas:pos Blogging.Blogs[type=table] models/Blog.cs:7:22
+-- atlas:pos Posts[type=table] models/Post.cs:6:15
+
 ALTER DATABASE CHARACTER SET utf8mb4;
+
+
+CREATE TABLE `AuditEntry` (
+    `Name` longtext CHARACTER SET utf8mb4 NULL
+) CHARACTER SET=utf8mb4;
 
 
 CREATE TABLE `Blogs` (
@@ -14,17 +23,17 @@ CREATE TABLE `Blogs` (
 ) CHARACTER SET=utf8mb4;
 
 
-CREATE TABLE `Post` (
+CREATE TABLE `Posts` (
     `PostId` int NOT NULL AUTO_INCREMENT,
     `Title` longtext CHARACTER SET utf8mb4 NOT NULL,
     `Content` longtext CHARACTER SET utf8mb4 NOT NULL,
     `BlogUrl` varchar(200) CHARACTER SET utf8mb4 NULL,
-    CONSTRAINT `PK_Post` PRIMARY KEY (`PostId`),
-    CONSTRAINT `FK_Post_Blogs_BlogUrl` FOREIGN KEY (`BlogUrl`) REFERENCES `Blogs` (`Url`)
+    CONSTRAINT `PK_Posts` PRIMARY KEY (`PostId`),
+    CONSTRAINT `FK_Posts_Blogs_BlogUrl` FOREIGN KEY (`BlogUrl`) REFERENCES `Blogs` (`Url`)
 ) CHARACTER SET=utf8mb4;
 
 
-CREATE INDEX `IX_Post_BlogUrl` ON `Post` (`BlogUrl`);
+CREATE INDEX `IX_Posts_BlogUrl` ON `Posts` (`BlogUrl`);
 
 
 

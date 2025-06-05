@@ -1,5 +1,5 @@
 ﻿using System;
-using System.IO;
+using System.Collections.Generic;
 using Atlas.Provider.Core.Executor;
 
 namespace Atlas.Provider.Core
@@ -46,6 +46,21 @@ namespace Atlas.Provider.Core
           Console.Out.NewLine = "\n";
           if (!string.IsNullOrEmpty(sql))
           {
+            var directives = new List<string>();
+            foreach (var (entity, table) in executor.GetEntityTable(name))
+            {
+              var pos = executor.LocateEntitySource(entity, name);
+              if (!string.IsNullOrEmpty(pos))
+              {
+                directives.Add($"-- atlas:pos {table}[type=table] {pos}");
+              }
+              else
+              {
+                directives.Add($"-- atlas:pos {table}[type=table]");
+              }
+            }
+            Console.WriteLine(string.Join("\n", directives));
+            Console.WriteLine();
             if (ctxInfo["ProviderName"]!.ToString()!.EndsWith("SqlServer"))
             {
               Console.WriteLine("-- atlas:delimiter GO");

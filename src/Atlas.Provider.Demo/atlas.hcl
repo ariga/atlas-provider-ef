@@ -13,8 +13,7 @@ locals {
 
 data "external_schema" "efcore" {
   program = [
-    "dotnet",
-    "atlas-ef",
+    "atlas-ef", # this is the global tool installed with `dotnet tool install -g atlas-ef`
     "--", var.dialect,
   ]
 }
