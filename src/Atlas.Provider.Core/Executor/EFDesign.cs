@@ -388,7 +388,7 @@ internal class EFDesign : IDisposable
           {
             var span = syntaxTree.GetLineSpan(dec.Span);
             var path = Path.GetRelativePath(_projectDir, f).Replace(Path.DirectorySeparatorChar, '/');
-            return $"{path}:{span.StartLinePosition.Line + 1}:{span.EndLinePosition.Line + 1}";
+            return $"{path}:{span.StartLinePosition.Line + 1}-{span.EndLinePosition.Line + 1}";
           }
         }
         catch
