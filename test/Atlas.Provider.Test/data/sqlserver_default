@@ -1,5 +1,19 @@
+-- atlas:pos AuditEntry[type=table] Program.cs:87-90
+-- atlas:pos Blogging.Blogs[type=table] models/Blog.cs:7-22
+-- atlas:pos Posts[type=table] models/Post.cs:6-15
+
 -- atlas:delimiter GO
-CREATE TABLE [Blogs] (
+IF SCHEMA_ID(N'Blogging') IS NULL EXEC(N'CREATE SCHEMA [Blogging];');
+GO
+
+
+CREATE TABLE [AuditEntry] (
+    [Name] nvarchar(max) NULL
+);
+GO
+
+
+CREATE TABLE [Blogging].[Blogs] (
     [BlogId] int NOT NULL IDENTITY,
     [Url] varchar(200) NOT NULL,
     [Rating] decimal(5,2) NOT NULL,
@@ -9,26 +23,24 @@ CREATE TABLE [Blogs] (
     CONSTRAINT [PK_Blogs] PRIMARY KEY ([BlogId]),
     CONSTRAINT [AK_Blogs_Url] UNIQUE ([Url])
 );
-DECLARE @defaultSchema AS sysname;
-SET @defaultSchema = SCHEMA_NAME();
 DECLARE @description AS sql_variant;
 SET @description = CONCAT(N'Content contains new lines \n\r and ', NCHAR(10), N' for example');
-EXEC sp_addextendedproperty 'MS_Description', @description, 'SCHEMA', @defaultSchema, 'TABLE', N'Blogs', 'COLUMN', N'Content';
+EXEC sp_addextendedproperty 'MS_Description', @description, 'SCHEMA', N'Blogging', 'TABLE', N'Blogs', 'COLUMN', N'Content';
 GO
 
 
-CREATE TABLE [Post] (
+CREATE TABLE [Posts] (
     [PostId] int NOT NULL IDENTITY,
     [Title] nvarchar(max) NOT NULL,
     [Content] nvarchar(max) NOT NULL,
     [BlogUrl] varchar(200) NULL,
-    CONSTRAINT [PK_Post] PRIMARY KEY ([PostId]),
-    CONSTRAINT [FK_Post_Blogs_BlogUrl] FOREIGN KEY ([BlogUrl]) REFERENCES [Blogs] ([Url])
+    CONSTRAINT [PK_Posts] PRIMARY KEY ([PostId]),
+    CONSTRAINT [FK_Posts_Blogs_BlogUrl] FOREIGN KEY ([BlogUrl]) REFERENCES [Blogging].[Blogs] ([Url])
 );
 GO
 
 
-CREATE INDEX [IX_Post_BlogUrl] ON [Post] ([BlogUrl]);
+CREATE INDEX [IX_Posts_BlogUrl] ON [Posts] ([BlogUrl]);
 GO
 
 

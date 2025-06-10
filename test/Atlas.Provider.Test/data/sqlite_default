@@ -1,3 +1,12 @@
+-- atlas:pos AuditEntry[type=table] Program.cs:87-90
+-- atlas:pos Blogging.Blogs[type=table] models/Blog.cs:7-22
+-- atlas:pos Posts[type=table] models/Post.cs:6-15
+
+CREATE TABLE "AuditEntry" (
+    "Name" TEXT NULL
+);
+
+
 CREATE TABLE "Blogs" (
     "BlogId" INTEGER NOT NULL CONSTRAINT "PK_Blogs" PRIMARY KEY AUTOINCREMENT,
 
@@ -16,16 +25,16 @@ CREATE TABLE "Blogs" (
 );
 
 
-CREATE TABLE "Post" (
-    "PostId" INTEGER NOT NULL CONSTRAINT "PK_Post" PRIMARY KEY AUTOINCREMENT,
+CREATE TABLE "Posts" (
+    "PostId" INTEGER NOT NULL CONSTRAINT "PK_Posts" PRIMARY KEY AUTOINCREMENT,
     "Title" TEXT NOT NULL,
     "Content" TEXT NOT NULL,
     "BlogUrl" varchar(200) NULL,
-    CONSTRAINT "FK_Post_Blogs_BlogUrl" FOREIGN KEY ("BlogUrl") REFERENCES "Blogs" ("Url")
+    CONSTRAINT "FK_Posts_Blogs_BlogUrl" FOREIGN KEY ("BlogUrl") REFERENCES "Blogs" ("Url")
 );
 
 
-CREATE INDEX "IX_Post_BlogUrl" ON "Post" ("BlogUrl");
+CREATE INDEX "IX_Posts_BlogUrl" ON "Posts" ("BlogUrl");
 
 
 
