@@ -1,6 +1,7 @@
 ﻿using Xunit;
 using System.Diagnostics;
 using System.Reflection;
+using System.Text.RegularExpressions;
 
 public class GenerateSchemaTest
 {
@@ -32,6 +33,13 @@ public class GenerateSchemaTest
       "",
       StringComparison.OrdinalIgnoreCase
     );
+    if (Path.DirectorySeparatorChar == '\\')
+    {
+      // (Windows) Replace backslashes in file paths (patterns like "folder\file.ext:line-line")
+      // but not escape sequences or other backslashes in SQL content
+      output = Regex.Replace(output, @"\\(?=[^\\]*\.[a-zA-Z]+:\d+)", "/");
+    }
+    
     string error = process.StandardError.ReadToEnd();
     process.WaitForExit();
     Assert.Equal(FileReader.Read(expectedFile), output);
