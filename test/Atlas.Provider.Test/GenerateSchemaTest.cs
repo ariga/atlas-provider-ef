@@ -27,6 +27,7 @@ public class GenerateSchemaTest
     using Process? process = Process.Start(startInfo);
     Assert.NotNull(process);
     string output = process.StandardOutput.ReadToEnd();
+    output = output.Replace(Environment.CurrentDirectory + Path.DirectorySeparatorChar, "");
     string error = process.StandardError.ReadToEnd();
     process.WaitForExit();
     Assert.Equal(FileReader.Read(expectedFile), output);
