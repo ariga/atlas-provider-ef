@@ -1,6 +1,7 @@
 ﻿using Xunit;
 using System.Diagnostics;
 using System.Reflection;
+using System.Text.RegularExpressions;
 
 public class GenerateSchemaTest
 {
@@ -15,7 +16,7 @@ public class GenerateSchemaTest
 
     ProcessStartInfo startInfo = new ProcessStartInfo
     {
-      WorkingDirectory = Path.GetFullPath("../../../../../src/Atlas.Provider.Demo"),
+      WorkingDirectory = Path.GetFullPath(Path.Combine("..", "..", "..", "..", "..", "src", "Atlas.Provider.Demo")),
       FileName = "dotnet",
       Arguments = $"exec {dllFileName} -- {providerName}",
       RedirectStandardOutput = true,
@@ -27,6 +28,18 @@ public class GenerateSchemaTest
     using Process? process = Process.Start(startInfo);
     Assert.NotNull(process);
     string output = process.StandardOutput.ReadToEnd();
+    output = output.Replace(
+      Path.GetFullPath(Path.Combine("..", "..", "..", "..", "..", "src", "Atlas.Provider.Demo")) + Path.DirectorySeparatorChar,
+      "",
+      StringComparison.OrdinalIgnoreCase
+    );
+    if (Path.DirectorySeparatorChar == '\\')
+    {
+      // (Windows) Replace backslashes in file paths (patterns like "folder\file.ext:line-line")
+      // but not escape sequences or other backslashes in SQL content
+      output = Regex.Replace(output, @"\\(?=[^\\]*\.[a-zA-Z]+:\d+)", "/");
+    }
+    
     string error = process.StandardError.ReadToEnd();
     process.WaitForExit();
     Assert.Equal(FileReader.Read(expectedFile), output);
