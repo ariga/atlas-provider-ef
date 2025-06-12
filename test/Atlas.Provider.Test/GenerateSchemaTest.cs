@@ -15,7 +15,7 @@ public class GenerateSchemaTest
 
     ProcessStartInfo startInfo = new ProcessStartInfo
     {
-      WorkingDirectory = Path.GetFullPath("../../../../../src/Atlas.Provider.Demo"),
+      WorkingDirectory = Path.GetFullPath(Path.Combine("..", "..", "..", "..", "..", "src", "Atlas.Provider.Demo")),
       FileName = "dotnet",
       Arguments = $"exec {dllFileName} -- {providerName}",
       RedirectStandardOutput = true,
@@ -27,7 +27,11 @@ public class GenerateSchemaTest
     using Process? process = Process.Start(startInfo);
     Assert.NotNull(process);
     string output = process.StandardOutput.ReadToEnd();
-    output = output.Replace(Environment.CurrentDirectory + Path.DirectorySeparatorChar, "");
+    output = output.Replace(
+      Path.GetFullPath(Path.Combine("..", "..", "..", "..", "..", "src", "Atlas.Provider.Demo")) + Path.DirectorySeparatorChar,
+      "",
+      StringComparison.OrdinalIgnoreCase
+    );
     string error = process.StandardError.ReadToEnd();
     process.WaitForExit();
     Assert.Equal(FileReader.Read(expectedFile), output);
