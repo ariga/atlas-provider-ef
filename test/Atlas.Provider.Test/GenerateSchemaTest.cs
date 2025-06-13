@@ -5,6 +5,28 @@ using System.Text.RegularExpressions;
 
 public class GenerateSchemaTest
 {
+  private static string GetDemoProjectPath()
+  {
+    // Find the solution root by looking for the .sln file
+    var currentDir = Directory.GetCurrentDirectory();
+    var solutionRoot = FindSolutionRoot(currentDir);
+    return Path.Combine(solutionRoot, "src", "Atlas.Provider.Demo");
+  }
+
+  private static string FindSolutionRoot(string startPath)
+  {
+    var directory = new DirectoryInfo(startPath);
+    while (directory != null)
+    {
+      if (directory.GetFiles("*.sln").Any())
+      {
+        return directory.FullName;
+      }
+      directory = directory.Parent;
+    }
+    throw new InvalidOperationException("Could not find solution root directory");
+  }
+
   [Theory]
   [InlineData("SqlServer", "data/sqlserver_default")]
   [InlineData("Postgres", "data/postgres_default")]
@@ -13,10 +35,11 @@ public class GenerateSchemaTest
   public void Can_generate_script(string providerName, string expectedFile)
   {
     var dllFileName = Assembly.Load(new AssemblyName("Atlas.Provider.Loader")).Location;
+    var demoProjectPath = GetDemoProjectPath();
 
     ProcessStartInfo startInfo = new ProcessStartInfo
     {
-      WorkingDirectory = Path.GetFullPath(Path.Combine("..", "..", "..", "..", "..", "src", "Atlas.Provider.Demo")),
+      WorkingDirectory = demoProjectPath,
       FileName = "dotnet",
       Arguments = $"exec {dllFileName} -- {providerName}",
       RedirectStandardOutput = true,
@@ -29,7 +52,7 @@ public class GenerateSchemaTest
     Assert.NotNull(process);
     string output = process.StandardOutput.ReadToEnd();
     output = output.Replace(
-      Path.GetFullPath(Path.Combine("..", "..", "..", "..", "..", "src", "Atlas.Provider.Demo")) + Path.DirectorySeparatorChar,
+      demoProjectPath + Path.DirectorySeparatorChar,
       "",
       StringComparison.OrdinalIgnoreCase
     );
