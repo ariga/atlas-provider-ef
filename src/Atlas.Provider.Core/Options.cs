@@ -15,6 +15,7 @@ namespace Atlas.Provider.Core
     public string Framework { get; set; } = string.Empty;
     public string WorkingDir { get; set; } = string.Empty;
     public bool Nullable { get; set; } = true;
+    public string? Context { get; set; }
     public List<string>? PositionalArgs { get; set; }
 
     public Options(string[] args)
@@ -49,6 +50,9 @@ namespace Atlas.Provider.Core
             break;
           case "--working-dir":
             if (i + 1 < args.Length) WorkingDir = args[++i];
+            break;
+          case "--context":
+            if (i + 1 < args.Length) Context = args[++i];
             break;
           default:
             if (PositionalArgs == null)

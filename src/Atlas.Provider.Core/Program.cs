@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Atlas.Provider.Core.Executor;
 
 namespace Atlas.Provider.Core
@@ -25,6 +26,12 @@ namespace Atlas.Provider.Core
           options.PositionalArgs?.ToArray()
         );
         var types = executor.GetContextTypes();
+        if (!string.IsNullOrEmpty(options.Context))
+        {
+          types = types.Where(t =>
+            t["Name"]?.ToString() == options.Context ||
+            t["FullName"]?.ToString()?.EndsWith("." + options.Context) == true);
+        }
         foreach (var type in types)
         {
           if (!type.Contains("Name") || type["Name"] == null)

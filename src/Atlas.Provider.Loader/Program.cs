@@ -91,6 +91,11 @@ namespace Atlas.Provider.Loader
         {
           arguments.Add("--nullable");
         }
+        if (!string.IsNullOrEmpty(context))
+        {
+          arguments.Add("--context");
+          arguments.Add(context);
+        }
         // dotnet exec [runtime-options] [path-to-application] [arguments]
         return Exe.Run("dotnet", [
             "exec",
