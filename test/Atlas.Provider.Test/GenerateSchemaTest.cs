@@ -41,7 +41,7 @@ public class GenerateSchemaTest
     {
       WorkingDirectory = demoProjectPath,
       FileName = "dotnet",
-      Arguments = $"exec {dllFileName} -- {providerName}",
+      Arguments = $"exec {dllFileName} --context BloggingContext -- {providerName}",
       RedirectStandardOutput = true,
       RedirectStandardError = true,
       UseShellExecute = false,
