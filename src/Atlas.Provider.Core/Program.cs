@@ -27,14 +27,19 @@ namespace Atlas.Provider.Core
         var types = executor.GetContextTypes();
         foreach (var type in types)
         {
-          if (!type.Contains("Name") || type["Name"] == null)
+          if (type["Name"] is not string name || string.IsNullOrEmpty(name))
           {
             continue;
           }
-          var name = type["Name"]!.ToString();
-          if (string.IsNullOrEmpty(name))
+          if (!string.IsNullOrEmpty(options.Context))
           {
-            continue;
+            var fullName = type["FullName"] as string;
+            var matches = name.Equals(options.Context, StringComparison.OrdinalIgnoreCase) ||
+                          (fullName?.Equals(options.Context, StringComparison.OrdinalIgnoreCase) ?? false);
+            if (!matches)
+            {
+              continue;
+            }
           }
           var ctxInfo = executor.GetContextInfo(name);
           if (ctxInfo == null || !ctxInfo.Contains("ProviderName") || ctxInfo["ProviderName"] == null)
