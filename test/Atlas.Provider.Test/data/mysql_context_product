@@ -1,0 +1,14 @@
+-- atlas:pos Inventory.Products[type=table] models/Product.cs:5-15
+
+ALTER DATABASE CHARACTER SET utf8mb4;
+
+
+CREATE TABLE `Products` (
+    `ProductId` int NOT NULL AUTO_INCREMENT,
+    `Name` varchar(100) CHARACTER SET utf8mb4 NOT NULL,
+    `Price` decimal(65,30) NOT NULL,
+    CONSTRAINT `PK_Products` PRIMARY KEY (`ProductId`)
+) CHARACTER SET=utf8mb4;
+
+
+

@@ -19,6 +19,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Atlas.Provider.Demo\Atlas.Provider.Demo.csproj" />
+    <ProjectReference Include="..\..\src\Atlas.Provider.Demo.MultiContext\Atlas.Provider.Demo.MultiContext.csproj" />
     <ProjectReference Include="..\..\src\Atlas.Provider.Core\Atlas.Provider.Core.csproj" />
     <ProjectReference Include="..\..\src\Atlas.Provider.Loader\Atlas.Provider.Loader.csproj" />
   </ItemGroup>
