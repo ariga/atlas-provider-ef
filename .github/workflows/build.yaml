@@ -90,18 +90,40 @@ jobs:
           version=$(basename "$nupkg_file" | sed 's/^atlas-ef\.//' | sed 's/\.nupkg$//')
           dotnet tool install --add-source ./nupkg --version "$version" -g atlas-ef
           echo "Installed atlas-ef version: $version"
+          
+      - name: Test tool without context flag (all contexts)
+        shell: bash
+        working-directory: ./src/Atlas.Provider.Demo
+        run: |
           atlas-ef -- sqlite
+
+      - name: Test tool with context flag
+        shell: bash
+        working-directory: ./src/Atlas.Provider.Demo
+        run: |
+          atlas-ef --context BloggingContext -- sqlite
+          
       - name: Install Atlas CLI
         uses: ariga/setup-atlas@v0
+        
       - name: Verify Atlas CLI version
         shell: pwsh
         run: atlas version
+        
       - name: Check migrations for sqlite
         working-directory: ./src/Atlas.Provider.Demo
         run: |
           atlas migrate diff --env ef --var dialect=sqlite
         env:
           ATLAS_TOKEN: ${{ secrets.ATLAS_TOKEN }}
+          
+      - name: Check migrations for sqlite (with context)
+        working-directory: ./src/Atlas.Provider.Demo
+        run: |
+          atlas migrate diff --env ef --var dialect=sqlite --var context=BloggingContext
+        env:
+          ATLAS_TOKEN: ${{ secrets.ATLAS_TOKEN }}
+          
       - name: Verify migrations generated
         shell: bash
         run: |

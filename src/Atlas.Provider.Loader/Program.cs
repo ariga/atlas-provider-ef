@@ -86,6 +86,11 @@ namespace Atlas.Provider.Loader
                 "--startup-assembly", Path.Combine(targetDir, _startupProject.TargetFileName!),
                 "--startup-project", startupProjectFile,
             ]);
+        if (!string.IsNullOrEmpty(context))
+        {
+          arguments.Add("--context");
+          arguments.Add(context);
+        }
         if (string.Equals(_project.Nullable, "enable", StringComparison.OrdinalIgnoreCase)
             || string.Equals(_project.Nullable, "annotations", StringComparison.OrdinalIgnoreCase))
         {

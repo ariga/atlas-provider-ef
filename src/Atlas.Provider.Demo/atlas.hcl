@@ -2,6 +2,11 @@ variable "dialect" {
   type = string
 }
 
+variable "context" {
+  type    = string
+  default = ""
+}
+
 locals {
   dev_url = {
     mysql = "docker://mysql/8/dev"
@@ -9,21 +14,31 @@ locals {
     sqlserver = "docker://sqlserver/2022-latest"
     sqlite = "sqlite://file::memory:?cache=shared"
   }[var.dialect]
+  
+  schema_url = var.context == "" ? data.external_schema.efcore.url : data.external_schema.efcore_context.url
 }
 
 data "external_schema" "efcore" {
   program = [
-    "atlas-ef", # this is the global tool installed with `dotnet tool install -g atlas-ef`
+    "atlas-ef",
+    "--", var.dialect,
+  ]
+}
+
+data "external_schema" "efcore_context" {
+  program = [
+    "atlas-ef",
+    "--context", var.context,
     "--", var.dialect,
   ]
 }
 
 env {
   name = atlas.env
-  src = data.external_schema.efcore.url
+  src = local.schema_url
   dev = local.dev_url
   migration {
-    dir = "file://migrations/${var.dialect}"
+    dir = var.context == "" ? "file://migrations/${var.dialect}" : "file://migrations/${var.dialect}/${var.context}"
   }
   format {
     migrate {
