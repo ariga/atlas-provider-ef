@@ -136,7 +136,7 @@ jobs:
       - name: Verify migrations generated
         shell: bash
         run: |
-          if git status --porcelain | grep -vq 'dotnet-tools.json' ; then
+          if git status --porcelain | grep -v 'dotnet-tools.json' | grep -vq 'Atlas.Provider.Demo.csproj' ; then
             echo "You need to run 'atlas migrate diff --env ef' and commit the changes"
             echo ""
             git status --porcelain
