@@ -53,11 +53,13 @@ jobs:
           path: "./artifacts"
 
   test-tool:
-    name: Test tool on ${{ matrix.os }}
+    name: Test tool on ${{ matrix.os }} with .NET ${{ matrix.dotnet }}
     needs: build
     strategy:
+      fail-fast: false
       matrix:
         os: [windows-latest, ubuntu-latest, macos-latest]
+        dotnet: ['8.0', '9.0', '10.0']
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout
@@ -70,7 +72,7 @@ jobs:
         with:
           dotnet-version: |
             6.0.x
-            8.0.x
+            ${{ matrix.dotnet }}.x
       - name: Download build artifacts
         uses: actions/download-artifact@v4
         with:
@@ -91,6 +93,13 @@ jobs:
           dotnet tool install --add-source ./nupkg --version "$version" -g atlas-ef
           echo "Installed atlas-ef version: $version"
           
+      - name: Update Demo Project TargetFramework
+        shell: pwsh
+        working-directory: ./src/Atlas.Provider.Demo
+        run: |
+          (Get-Content Atlas.Provider.Demo.csproj) -replace '<TargetFramework>net6.0</TargetFramework>', '<TargetFramework>net${{ matrix.dotnet }}</TargetFramework>' | Set-Content Atlas.Provider.Demo.csproj
+          Get-Content Atlas.Provider.Demo.csproj
+
       - name: Test tool without context flag (all contexts)
         shell: bash
         working-directory: ./src/Atlas.Provider.Demo
