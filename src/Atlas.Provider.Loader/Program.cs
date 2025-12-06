@@ -42,6 +42,20 @@ namespace Atlas.Provider.Loader
                 // Load the deps for the atlas provider core
                 "--additional-deps", Path.Combine(loaderDirPath!, AssemblyName + ".deps.json"),
             };
+        runtimeOpts.Add("--additionalprobingpath");
+        runtimeOpts.Add(loaderDirPath!);
+        var corePackagePath = Path.Combine(loaderDirPath!, AssemblyName);
+        if (Directory.Exists(corePackagePath))
+        {
+          runtimeOpts.Add("--additionalprobingpath");
+          runtimeOpts.Add(corePackagePath);
+        }
+        var localStore = EnsureLocalPackageStore(loaderDirPath!);
+        if (Directory.Exists(localStore))
+        {
+          runtimeOpts.Add("--additionalprobingpath");
+          runtimeOpts.Add(localStore);
+        }
         var projectAssetsFile = _startupProject.ProjectAssetsFile;
         if (!string.IsNullOrEmpty(projectAssetsFile))
         {
@@ -109,6 +123,78 @@ namespace Atlas.Provider.Loader
         Console.Error.WriteLine(ex.Message);
         return 1;
       }
+    }
+
+    private static string EnsureLocalPackageStore(string loaderDirPath)
+    {
+      var storeRoot = Path.Combine(loaderDirPath, ".packages");
+      try
+      {
+        var depsPath = Path.Combine(loaderDirPath, AssemblyName + ".deps.json");
+        if (!File.Exists(depsPath))
+        {
+          return storeRoot;
+        }
+        using var depsDoc = JsonDocument.Parse(File.ReadAllBytes(depsPath));
+        var runtimeTargetName = depsDoc.RootElement.GetProperty("runtimeTarget").GetProperty("name").GetString();
+        if (string.IsNullOrEmpty(runtimeTargetName))
+        {
+          return storeRoot;
+        }
+        var targets = depsDoc.RootElement.GetProperty("targets").GetProperty(runtimeTargetName);
+        var libraries = depsDoc.RootElement.GetProperty("libraries");
+        var filesByName = Directory.EnumerateFiles(loaderDirPath, "*", SearchOption.AllDirectories)
+          .ToLookup(Path.GetFileName, StringComparer.OrdinalIgnoreCase);
+        foreach (var lib in targets.EnumerateObject())
+        {
+          if (!libraries.TryGetProperty(lib.Name, out var libEntry))
+          {
+            continue;
+          }
+          var libPath = libEntry.TryGetProperty("path", out var pathProp) ? pathProp.GetString() : null;
+          var libType = libEntry.TryGetProperty("type", out var typeProp) ? typeProp.GetString() : null;
+          // For project refs (like Atlas.Provider.Core in our tool) there is no package path; use the library name.
+          if (string.IsNullOrEmpty(libPath))
+          {
+            libPath = lib.Name;
+          }
+          if (string.IsNullOrEmpty(libType))
+          {
+            libType = "project";
+          }
+          if (!lib.Value.TryGetProperty("runtime", out var runtimeAssets))
+          {
+            continue;
+          }
+          foreach (var asset in runtimeAssets.EnumerateObject())
+          {
+            var relAssetPath = asset.Name.Replace('/', Path.DirectorySeparatorChar);
+            var destPath = Path.Combine(storeRoot, libPath, relAssetPath);
+            var destDir = Path.GetDirectoryName(destPath);
+            if (destDir == null)
+            {
+              continue;
+            }
+            Directory.CreateDirectory(destDir);
+            if (File.Exists(destPath))
+            {
+              continue;
+            }
+            var fileName = Path.GetFileName(relAssetPath);
+            var source = filesByName[fileName].FirstOrDefault();
+            if (source == null)
+            {
+              continue;
+            }
+            File.Copy(source, destPath, true);
+          }
+        }
+      }
+      catch
+      {
+        // Best-effort; fall back to other probing paths if this fails.
+      }
+      return storeRoot;
     }
   }
 }
