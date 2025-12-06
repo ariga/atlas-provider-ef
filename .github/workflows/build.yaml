@@ -70,9 +70,10 @@ jobs:
       - name: Install .NET Core SDK
         uses: actions/setup-dotnet@v3.2.0
         with:
+          # Need net6.0 for the tool and matrix SDK for the demo app target.
           dotnet-version: |
-            6.0.x # needed to build the tool (net6.0)
-            ${{ matrix.dotnet }}.x # matrix SDK for demo app target
+            6.0.x
+            ${{ matrix.dotnet }}.x
       - name: Download build artifacts
         uses: actions/download-artifact@v4
         with:
