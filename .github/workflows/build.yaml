@@ -97,8 +97,24 @@ jobs:
         shell: pwsh
         working-directory: ./src/Atlas.Provider.Demo
         run: |
-          (Get-Content Atlas.Provider.Demo.csproj) -replace '<TargetFramework>net6.0</TargetFramework>', '<TargetFramework>net${{ matrix.dotnet }}</TargetFramework>' | Set-Content Atlas.Provider.Demo.csproj
-          Get-Content Atlas.Provider.Demo.csproj
+          $csprojPath = "Atlas.Provider.Demo.csproj"
+          [xml]$xml = Get-Content $csprojPath
+          $updated = $false
+          foreach ($pg in $xml.Project.PropertyGroup) {
+            if ($pg.TargetFramework) {
+              $pg.TargetFramework = "net${{ matrix.dotnet }}"
+              $updated = $true
+            }
+            if ($pg.TargetFrameworks) {
+              $pg.TargetFrameworks = "net${{ matrix.dotnet }}"
+              $updated = $true
+            }
+          }
+          if (-not $updated) {
+            throw "No <TargetFramework> or <TargetFrameworks> element found in $csprojPath"
+          }
+          $xml.Save((Resolve-Path $csprojPath))
+          Get-Content $csprojPath
 
       - name: Test tool without context flag (all contexts)
         shell: bash
