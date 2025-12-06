@@ -128,6 +128,10 @@ namespace Atlas.Provider.Loader
     private static string EnsureLocalPackageStore(string loaderDirPath)
     {
       var storeRoot = Path.Combine(loaderDirPath, ".packages");
+      var storeRootFull = Path.GetFullPath(storeRoot);
+      var storeRootPrefix = storeRootFull.EndsWith(Path.DirectorySeparatorChar)
+        ? storeRootFull
+        : storeRootFull + Path.DirectorySeparatorChar;
       try
       {
         var depsPath = Path.Combine(loaderDirPath, AssemblyName + ".deps.json");
@@ -136,40 +140,67 @@ namespace Atlas.Provider.Loader
           return storeRoot;
         }
         using var depsDoc = JsonDocument.Parse(File.ReadAllBytes(depsPath));
-        var runtimeTargetName = depsDoc.RootElement.GetProperty("runtimeTarget").GetProperty("name").GetString();
+        var root = depsDoc.RootElement;
+        if (!root.TryGetProperty("runtimeTarget", out var runtimeTargetProp)
+            || !runtimeTargetProp.TryGetProperty("name", out var runtimeTargetNameProp))
+        {
+          return storeRoot;
+        }
+        var runtimeTargetName = runtimeTargetNameProp.GetString();
         if (string.IsNullOrEmpty(runtimeTargetName))
         {
           return storeRoot;
         }
-        var targets = depsDoc.RootElement.GetProperty("targets").GetProperty(runtimeTargetName);
-        var libraries = depsDoc.RootElement.GetProperty("libraries");
+        if (!root.TryGetProperty("targets", out var targetsProp)
+            || !targetsProp.TryGetProperty(runtimeTargetName, out var targets))
+        {
+          return storeRoot;
+        }
+        if (!root.TryGetProperty("libraries", out var libraries))
+        {
+          return storeRoot;
+        }
+
+        var runtimeLibs = new List<(string Name, JsonElement RuntimeAssets)>();
+        foreach (var lib in targets.EnumerateObject())
+        {
+          if (!lib.Value.TryGetProperty("runtime", out var runtimeAssets))
+          {
+            continue;
+          }
+          if (!runtimeAssets.EnumerateObject().Any())
+          {
+            continue;
+          }
+          runtimeLibs.Add((lib.Name, runtimeAssets));
+        }
+        if (runtimeLibs.Count == 0)
+        {
+          return storeRoot;
+        }
+
         var filesByName = Directory.EnumerateFiles(loaderDirPath, "*", SearchOption.AllDirectories)
           .ToLookup(Path.GetFileName, StringComparer.OrdinalIgnoreCase);
-        foreach (var lib in targets.EnumerateObject())
+        foreach (var lib in runtimeLibs)
         {
           if (!libraries.TryGetProperty(lib.Name, out var libEntry))
           {
             continue;
           }
           var libPath = libEntry.TryGetProperty("path", out var pathProp) ? pathProp.GetString() : null;
-          var libType = libEntry.TryGetProperty("type", out var typeProp) ? typeProp.GetString() : null;
           // For project refs (like Atlas.Provider.Core in our tool) there is no package path; use the library name.
           if (string.IsNullOrEmpty(libPath))
           {
             libPath = lib.Name;
           }
-          if (string.IsNullOrEmpty(libType))
-          {
-            libType = "project";
-          }
-          if (!lib.Value.TryGetProperty("runtime", out var runtimeAssets))
-          {
-            continue;
-          }
-          foreach (var asset in runtimeAssets.EnumerateObject())
+          foreach (var asset in lib.RuntimeAssets.EnumerateObject())
           {
             var relAssetPath = asset.Name.Replace('/', Path.DirectorySeparatorChar);
-            var destPath = Path.Combine(storeRoot, libPath, relAssetPath);
+            var destPath = Path.GetFullPath(Path.Combine(storeRootPrefix, libPath, relAssetPath));
+            if (!destPath.StartsWith(storeRootPrefix, StringComparison.OrdinalIgnoreCase))
+            {
+              continue;
+            }
             var destDir = Path.GetDirectoryName(destPath);
             if (destDir == null)
             {
