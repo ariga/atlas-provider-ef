@@ -161,18 +161,19 @@ namespace Atlas.Provider.Loader
           return storeRoot;
         }
 
-        var runtimeLibs = new List<(string Name, JsonElement RuntimeAssets)>();
+        var runtimeLibs = new List<(string Name, JsonProperty[] RuntimeAssets)>();
         foreach (var lib in targets.EnumerateObject())
         {
           if (!lib.Value.TryGetProperty("runtime", out var runtimeAssets))
           {
             continue;
           }
-          if (!runtimeAssets.EnumerateObject().Any())
+          var runtimeAssetProps = runtimeAssets.EnumerateObject().ToArray();
+          if (runtimeAssetProps.Length == 0)
           {
             continue;
           }
-          runtimeLibs.Add((lib.Name, runtimeAssets));
+          runtimeLibs.Add((lib.Name, runtimeAssetProps));
         }
         if (runtimeLibs.Count == 0)
         {
@@ -180,7 +181,9 @@ namespace Atlas.Provider.Loader
         }
 
         var filesByName = Directory.EnumerateFiles(loaderDirPath, "*", SearchOption.AllDirectories)
-          .ToLookup(Path.GetFileName, StringComparer.OrdinalIgnoreCase);
+          .Select(path => (Path: path, FileName: Path.GetFileName(path)))
+          .Where(t => !string.IsNullOrEmpty(t.FileName))
+          .ToLookup(t => t.FileName!, t => t.Path, StringComparer.OrdinalIgnoreCase);
         foreach (var lib in runtimeLibs)
         {
           if (!libraries.TryGetProperty(lib.Name, out var libEntry))
@@ -193,7 +196,7 @@ namespace Atlas.Provider.Loader
           {
             libPath = lib.Name;
           }
-          foreach (var asset in lib.RuntimeAssets.EnumerateObject())
+          foreach (var asset in lib.RuntimeAssets)
           {
             var relAssetPath = asset.Name.Replace('/', Path.DirectorySeparatorChar);
             var destPath = Path.GetFullPath(Path.Combine(storeRootPrefix, libPath, relAssetPath));
@@ -207,17 +210,13 @@ namespace Atlas.Provider.Loader
               continue;
             }
             Directory.CreateDirectory(destDir);
-            if (File.Exists(destPath))
-            {
-              continue;
-            }
             var fileName = Path.GetFileName(relAssetPath);
             var source = filesByName[fileName].FirstOrDefault();
             if (source == null)
             {
               continue;
             }
-            File.Copy(source, destPath, true);
+            File.Copy(source, destPath, false);
           }
         }
       }
