@@ -125,98 +125,87 @@ namespace Atlas.Provider.Loader
       }
     }
 
+    /// <summary>
+    /// Ensures a local package store exists by copying runtime assets from the loader directory.
+    /// This enables the .NET runtime to resolve dependencies when running Atlas.Provider.Core.
+    /// </summary>
+    /// <param name="loaderDirPath">The directory containing the loader assembly.</param>
+    /// <returns>The path to the local package store directory.</returns>
     private static string EnsureLocalPackageStore(string loaderDirPath)
     {
       var storeRoot = Path.Combine(loaderDirPath, ".packages");
-      var storeRootFull = Path.GetFullPath(storeRoot);
-      var storeRootPrefix = storeRootFull.EndsWith(Path.DirectorySeparatorChar)
-        ? storeRootFull
-        : storeRootFull + Path.DirectorySeparatorChar;
+      var depsPath = Path.Combine(loaderDirPath, AssemblyName + ".deps.json");
+
+      if (!File.Exists(depsPath))
+      {
+        return storeRoot;
+      }
+
       try
       {
-        var depsPath = Path.Combine(loaderDirPath, AssemblyName + ".deps.json");
-        if (!File.Exists(depsPath))
-        {
-          return storeRoot;
-        }
-        using var depsDoc = JsonDocument.Parse(File.ReadAllBytes(depsPath));
+        using var stream = File.OpenRead(depsPath);
+        using var depsDoc = JsonDocument.Parse(stream);
         var root = depsDoc.RootElement;
-        if (!root.TryGetProperty("runtimeTarget", out var runtimeTargetProp)
-            || !runtimeTargetProp.TryGetProperty("name", out var runtimeTargetNameProp))
-        {
-          return storeRoot;
-        }
-        var runtimeTargetName = runtimeTargetNameProp.GetString();
-        if (string.IsNullOrEmpty(runtimeTargetName))
-        {
-          return storeRoot;
-        }
-        if (!root.TryGetProperty("targets", out var targetsProp)
-            || !targetsProp.TryGetProperty(runtimeTargetName, out var targets))
-        {
-          return storeRoot;
-        }
-        if (!root.TryGetProperty("libraries", out var libraries))
+
+        if (!root.TryGetProperty("runtimeTarget", out var runtimeTargetProp) ||
+            !runtimeTargetProp.TryGetProperty("name", out var runtimeTargetNameProp) ||
+            runtimeTargetNameProp.GetString() is not { Length: > 0 } runtimeTargetName)
         {
           return storeRoot;
         }
 
-        var runtimeLibs = new List<(string Name, JsonProperty[] RuntimeAssets)>();
+        if (!root.TryGetProperty("targets", out var targetsProp) ||
+            !targetsProp.TryGetProperty(runtimeTargetName, out var targets) ||
+            !root.TryGetProperty("libraries", out var libraries))
+        {
+          return storeRoot;
+        }
+
+        Dictionary<string, string>? filesByName = null;
+
         foreach (var lib in targets.EnumerateObject())
         {
           if (!lib.Value.TryGetProperty("runtime", out var runtimeAssets))
           {
             continue;
           }
-          var runtimeAssetProps = runtimeAssets.EnumerateObject().ToArray();
-          if (runtimeAssetProps.Length == 0)
-          {
-            continue;
-          }
-          runtimeLibs.Add((lib.Name, runtimeAssetProps));
-        }
-        if (runtimeLibs.Count == 0)
-        {
-          return storeRoot;
-        }
 
-        var filesByName = Directory.EnumerateFiles(loaderDirPath, "*", SearchOption.AllDirectories)
-          .Select(path => (Path: path, FileName: Path.GetFileName(path)))
-          .Where(t => !string.IsNullOrEmpty(t.FileName))
-          .ToLookup(t => t.FileName!, t => t.Path, StringComparer.OrdinalIgnoreCase);
-        foreach (var lib in runtimeLibs)
-        {
           if (!libraries.TryGetProperty(lib.Name, out var libEntry))
           {
             continue;
           }
+
           var libPath = libEntry.TryGetProperty("path", out var pathProp) ? pathProp.GetString() : null;
-          // For project refs (like Atlas.Provider.Core in our tool) there is no package path; use the library name.
+          // For project refs (like Atlas.Provider.Core) there is no package path; use the library name.
           if (string.IsNullOrEmpty(libPath))
           {
             libPath = lib.Name;
           }
-          foreach (var asset in lib.RuntimeAssets)
+
+          foreach (var asset in runtimeAssets.EnumerateObject())
           {
             var relAssetPath = asset.Name.Replace('/', Path.DirectorySeparatorChar);
-            var destPath = Path.GetFullPath(Path.Combine(storeRootPrefix, libPath, relAssetPath));
-            if (!destPath.StartsWith(storeRootPrefix, StringComparison.OrdinalIgnoreCase))
+            var destPath = Path.Combine(storeRoot, libPath, relAssetPath);
+
+            // Skip if destination already exists
+            if (File.Exists(destPath))
             {
               continue;
             }
-            var destDir = Path.GetDirectoryName(destPath);
-            if (destDir == null)
-            {
-              continue;
-            }
-            Directory.CreateDirectory(destDir);
+
+            filesByName ??= BuildFileIndex(loaderDirPath);
             var fileName = Path.GetFileName(relAssetPath);
-            var source = filesByName[fileName].FirstOrDefault();
-            if (source == null)
+            if (!filesByName.TryGetValue(fileName, out var source))
             {
               continue;
             }
-            File.Copy(source, destPath, false);
+
+            var destDir = Path.GetDirectoryName(destPath);
+            if (!string.IsNullOrEmpty(destDir))
+            {
+              Directory.CreateDirectory(destDir);
+              File.Copy(source, destPath, overwrite: false);
+            }
           }
         }
       }
@@ -224,7 +213,22 @@ namespace Atlas.Provider.Loader
       {
         // Best-effort; fall back to other probing paths if this fails.
       }
+
       return storeRoot;
+    }
+
+    /// <summary>
+    /// Builds a case-insensitive index of file names to their full paths.
+    /// </summary>
+    private static Dictionary<string, string> BuildFileIndex(string directory)
+    {
+      var result = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+      foreach (var path in Directory.EnumerateFiles(directory, "*", SearchOption.AllDirectories))
+      {
+        var fileName = Path.GetFileName(path);
+        result.TryAdd(fileName, path);
+      }
+      return result;
     }
   }
 }
