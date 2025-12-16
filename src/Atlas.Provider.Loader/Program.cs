@@ -42,6 +42,20 @@ namespace Atlas.Provider.Loader
                 // Load the deps for the atlas provider core
                 "--additional-deps", Path.Combine(loaderDirPath!, AssemblyName + ".deps.json"),
             };
+        runtimeOpts.Add("--additionalprobingpath");
+        runtimeOpts.Add(loaderDirPath!);
+        var corePackagePath = Path.Combine(loaderDirPath!, AssemblyName);
+        if (Directory.Exists(corePackagePath))
+        {
+          runtimeOpts.Add("--additionalprobingpath");
+          runtimeOpts.Add(corePackagePath);
+        }
+        var localStore = EnsureLocalPackageStore(loaderDirPath!);
+        if (Directory.Exists(localStore))
+        {
+          runtimeOpts.Add("--additionalprobingpath");
+          runtimeOpts.Add(localStore);
+        }
         var projectAssetsFile = _startupProject.ProjectAssetsFile;
         if (!string.IsNullOrEmpty(projectAssetsFile))
         {
@@ -109,6 +123,112 @@ namespace Atlas.Provider.Loader
         Console.Error.WriteLine(ex.Message);
         return 1;
       }
+    }
+
+    /// <summary>
+    /// Ensures a local package store exists by copying runtime assets from the loader directory.
+    /// This enables the .NET runtime to resolve dependencies when running Atlas.Provider.Core.
+    /// </summary>
+    /// <param name="loaderDirPath">The directory containing the loader assembly.</param>
+    /// <returns>The path to the local package store directory.</returns>
+    private static string EnsureLocalPackageStore(string loaderDirPath)
+    {
+      var storeRoot = Path.Combine(loaderDirPath, ".packages");
+      var depsPath = Path.Combine(loaderDirPath, AssemblyName + ".deps.json");
+
+      if (!File.Exists(depsPath))
+      {
+        return storeRoot;
+      }
+
+      try
+      {
+        using var stream = File.OpenRead(depsPath);
+        using var depsDoc = JsonDocument.Parse(stream);
+        var root = depsDoc.RootElement;
+
+        if (!root.TryGetProperty("runtimeTarget", out var runtimeTargetProp) ||
+            !runtimeTargetProp.TryGetProperty("name", out var runtimeTargetNameProp) ||
+            runtimeTargetNameProp.GetString() is not { Length: > 0 } runtimeTargetName)
+        {
+          return storeRoot;
+        }
+
+        if (!root.TryGetProperty("targets", out var targetsProp) ||
+            !targetsProp.TryGetProperty(runtimeTargetName, out var targets) ||
+            !root.TryGetProperty("libraries", out var libraries))
+        {
+          return storeRoot;
+        }
+
+        Dictionary<string, string>? filesByName = null;
+
+        foreach (var lib in targets.EnumerateObject())
+        {
+          if (!lib.Value.TryGetProperty("runtime", out var runtimeAssets))
+          {
+            continue;
+          }
+
+          if (!libraries.TryGetProperty(lib.Name, out var libEntry))
+          {
+            continue;
+          }
+
+          var libPath = libEntry.TryGetProperty("path", out var pathProp) ? pathProp.GetString() : null;
+          // For project refs (like Atlas.Provider.Core) there is no package path; use the library name.
+          if (string.IsNullOrEmpty(libPath))
+          {
+            libPath = lib.Name;
+          }
+
+          foreach (var asset in runtimeAssets.EnumerateObject())
+          {
+            var relAssetPath = asset.Name.Replace('/', Path.DirectorySeparatorChar);
+            var destPath = Path.Combine(storeRoot, libPath, relAssetPath);
+
+            // Skip if destination already exists
+            if (File.Exists(destPath))
+            {
+              continue;
+            }
+
+            filesByName ??= BuildFileIndex(loaderDirPath);
+            var fileName = Path.GetFileName(relAssetPath);
+            if (!filesByName.TryGetValue(fileName, out var source))
+            {
+              continue;
+            }
+
+            var destDir = Path.GetDirectoryName(destPath);
+            if (!string.IsNullOrEmpty(destDir))
+            {
+              Directory.CreateDirectory(destDir);
+              File.Copy(source, destPath, overwrite: false);
+            }
+          }
+        }
+      }
+      catch
+      {
+        // Best-effort; fall back to other probing paths if this fails.
+      }
+
+      return storeRoot;
+    }
+
+    /// <summary>
+    /// Builds a case-insensitive index of file names to their full paths.
+    /// </summary>
+    private static Dictionary<string, string> BuildFileIndex(string directory)
+    {
+      var result = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+      foreach (var path in Directory.EnumerateFiles(directory, "*", SearchOption.AllDirectories))
+      {
+        var fileName = Path.GetFileName(path);
+        result.TryAdd(fileName, path);
+      }
+      return result;
     }
   }
 }

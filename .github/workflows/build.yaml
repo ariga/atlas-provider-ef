@@ -53,11 +53,13 @@ jobs:
           path: "./artifacts"
 
   test-tool:
-    name: Test tool on ${{ matrix.os }}
+    name: Test tool on ${{ matrix.os }} with .NET ${{ matrix.dotnet }}
     needs: build
     strategy:
+      fail-fast: false
       matrix:
         os: [windows-latest, ubuntu-latest, macos-latest]
+        dotnet: ['8.0', '9.0', '10.0']
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout
@@ -68,9 +70,10 @@ jobs:
       - name: Install .NET Core SDK
         uses: actions/setup-dotnet@v3.2.0
         with:
+          # Need net6.0 for the tool and matrix SDK for the demo app target.
           dotnet-version: |
             6.0.x
-            8.0.x
+            ${{ matrix.dotnet }}.x
       - name: Download build artifacts
         uses: actions/download-artifact@v4
         with:
@@ -91,6 +94,29 @@ jobs:
           dotnet tool install --add-source ./nupkg --version "$version" -g atlas-ef
           echo "Installed atlas-ef version: $version"
           
+      - name: Update Demo Project TargetFramework
+        shell: pwsh
+        working-directory: ./src/Atlas.Provider.Demo
+        run: |
+          $csprojPath = "Atlas.Provider.Demo.csproj"
+          [xml]$xml = Get-Content $csprojPath
+          $updated = $false
+          foreach ($pg in $xml.Project.PropertyGroup) {
+            if ($pg.TargetFramework) {
+              $pg.TargetFramework = "net${{ matrix.dotnet }}"
+              $updated = $true
+            }
+            if ($pg.TargetFrameworks) {
+              $pg.TargetFrameworks = "net${{ matrix.dotnet }}"
+              $updated = $true
+            }
+          }
+          if (-not $updated) {
+            throw "No <TargetFramework> or <TargetFrameworks> element found in $csprojPath"
+          }
+          $xml.Save((Resolve-Path $csprojPath))
+          Get-Content $csprojPath
+
       - name: Test tool without context flag (all contexts)
         shell: bash
         working-directory: ./src/Atlas.Provider.Demo
@@ -127,7 +153,7 @@ jobs:
       - name: Verify migrations generated
         shell: bash
         run: |
-          if git status --porcelain | grep -vq 'dotnet-tools.json' ; then
+          if git status --porcelain | grep -v 'dotnet-tools.json' | grep -vq 'Atlas.Provider.Demo.csproj' ; then
             echo "You need to run 'atlas migrate diff --env ef' and commit the changes"
             echo ""
             git status --porcelain
