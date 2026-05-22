@@ -26,12 +26,12 @@ jobs:
     runs-on: windows-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4.0.0
+        uses: actions/checkout@1e31de5234b9f8995739874a8ce0492dc87873e2 # v4.0.0
         with:
           lfs: true
           fetch-depth: 0
       - name: Install .NET Core SDK
-        uses: actions/setup-dotnet@v3.2.0
+        uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4
         with:
           dotnet-version: '8.0.x'
       - name: List SDKs
@@ -47,7 +47,7 @@ jobs:
         shell: pwsh
         run: dotnet cake --target=CI
       - name: Publish artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: build-artifacts
           path: "./artifacts"
@@ -63,19 +63,20 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4.0.0
+        uses: actions/checkout@1e31de5234b9f8995739874a8ce0492dc87873e2 # v4.0.0
         with:
           lfs: true
           fetch-depth: 0
       - name: Install .NET Core SDK
-        uses: actions/setup-dotnet@v3.2.0
+        uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4
         with:
-          # Need net6.0 for the tool and matrix SDK for the demo app target.
+          # Need net6.0 for the tool, net8.0 for MinVer, and matrix SDK for the demo app target.
           dotnet-version: |
             6.0.x
+            8.0.x
             ${{ matrix.dotnet }}.x
       - name: Download build artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
           name: build-artifacts
           path: "./artifacts"
@@ -130,7 +131,7 @@ jobs:
           atlas-ef --context BloggingContext -- sqlite
           
       - name: Install Atlas CLI
-        uses: ariga/setup-atlas@v0
+        uses: ariga/setup-atlas@2f3c785c89a15e1c0d07bcae3900fb5feb969eea # v0
         
       - name: Verify Atlas CLI version
         shell: pwsh
@@ -168,12 +169,12 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4.0.0
+        uses: actions/checkout@1e31de5234b9f8995739874a8ce0492dc87873e2 # v4.0.0
         with:
           lfs: true
           fetch-depth: 0
       - name: Install .NET Core SDK
-        uses: actions/setup-dotnet@v3.2.0
+        uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4
         with:
           dotnet-version: |
             6.0.x
@@ -188,7 +189,7 @@ jobs:
         shell: pwsh
         run: dotnet cake --target=Test
       - name: Upload test results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: test-artifacts ( ${{ matrix.os }} )
           path: "./artifacts/**/*.xml"
@@ -203,11 +204,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download Artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
           path: "./artifacts"
       - name: Publish Test Summary
-        uses: test-summary/action@v2
+        uses: test-summary/action@37b508cfee6d4d080eedd00b5bb240a6a784a6a5 # v2
         if: always()
         with:
           paths: "./artifacts/*/*.xml"
@@ -224,7 +225,7 @@ jobs:
     runs-on: windows-latest
     steps:
       - name: Download Artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
           name: build-artifacts
       - name: Dotnet NuGet Add Source
@@ -246,7 +247,7 @@ jobs:
     runs-on: windows-latest
     steps:
       - name: Download Artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
           name: build-artifacts
       - name: Dotnet NuGet Push
