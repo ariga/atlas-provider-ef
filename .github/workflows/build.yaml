@@ -245,6 +245,9 @@ jobs:
       name: NuGet
       url: https://www.nuget.org/packages/atlas-ef
     runs-on: windows-latest
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - name: Download Artifact
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
